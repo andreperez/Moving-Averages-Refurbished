@@ -6,32 +6,31 @@ study("Compiled Almanaque of Means", overlay=true, resolution="")
 
 // ————— Input options for Averages
 
-var string SMA = "Simple"
-var string EMA = "Exponential"
+var string SMA  = "Simple"
+var string EMA  = "Exponential"
 var string DEMA = "Double Exponential"
 var string TEMA = "Triple Exponential"
-var string WMA = "Weighted"
+var string WMA  = "Weighted"
 var string SMMA = "Smoothed"
 var string LSMA = "Least Squares"
-var string HMA = "Hull"
+var string HMA  = "Hull"
 var string ALMA = "Arnaud Legoux"
 
 // ————— Average 1
-string  group_1     = "Moving Average 1"
-bool    show_avg_1  = input(title="On/Off", type=input.bool, defval=true, group=group_1, inline="9")
-string  i_type_1    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=group_1, inline="10")
-color   i_color_1   = input(color.blue, "", group=group_1, inline="10")
-int     i_length_1  = input(8, minval=1, title="Length", group=group_1, inline="10")
-float   i_src_1     = input(close, title="Source", group=group_1, inline="11")
-int     i_offset_1  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=group_1, inline="11")
+bool    i_show_avg_1    = input(title="Moving Average 1", type=input.bool, defval=true, inline="10")
+color   i_color_1       = input(color.blue, "", inline="10")
+string  i_type_1        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="11")
+int     i_length_1      = input(8, minval=1, title="Length", inline="11")
+float   i_src_1         = input(close, title="Source", inline="12")
+int     i_offset_1      = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="12")
 
 // ————— Average 2
-string  group_2     = "Moving Average 2"
-string  i_type_2    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=group_2, inline="12")
-color   i_color_2   = input(color.red, "", group=group_2, inline="12")
-int     i_length_2  = input(21, minval=1, title="Length", group=group_2, inline="12")
-float   i_src_2     = input(close, title="Source", group=group_2, inline="13")
-int     i_offset_2  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=group_2, inline="13")
+bool    i_show_avg_2    = input(title="Moving Average 2", type=input.bool, defval=true, inline="13")
+color   i_color_2       = input(color.red, "", inline="13")
+string  i_type_2        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="14")
+int     i_length_2      = input(21, minval=1, title="Length", inline="14")
+float   i_src_2         = input(close, title="Source", inline="15")
+int     i_offset_2      = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="15")
 
 // ————— Average 3
 string  group_3     = "Moving Average 3"
@@ -108,8 +107,8 @@ f_average(_type, _src, _len) =>
         f_wma(_src, _len)
 
 // ————— Main
-plot( f_average(i_type_1, i_src_1, i_length_1), color=i_color_1, offset=i_offset_1 )
-plot( f_average(i_type_2, i_src_2, i_length_2), color=i_color_2, offset=i_offset_2 )
+plot( i_show_avg_1 ? f_average(i_type_1, i_src_1, i_length_1) : na, color=i_color_1, offset=i_offset_1 )
+plot( i_show_avg_2 ? f_average(i_type_2, i_src_2, i_length_2) : na, color=i_color_2, offset=i_offset_2 )
 plot( f_average(i_type_3, i_src_3, i_length_3), color=i_color_3, offset=i_offset_3 )
 plot( f_average(i_type_4, i_src_4, i_length_4), color=i_color_4, offset=i_offset_4 )
 plot( f_average(i_type_5, i_src_5, i_length_5), color=i_color_5, offset=i_offset_5 )
