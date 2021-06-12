@@ -19,10 +19,10 @@ var string ALMA = "Arnaud Legoux Moving Average"
 // ————— Average 1
 string GP1 = "Average 1"
 string i_type_1 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP1, inline="10")
-int i_length_1 = input(9, minval=1, title="Length", group=GP1, inline="11")
-i_src_1 = input(close, title="Source", group=GP1, inline="11")
-i_offset_1 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP1, inline="11")
-color i_color_1 = input(color.blue, "", group=GP1, inline="11")
+color i_color_1 = input(color.blue, "", group=GP1, inline="10")
+int i_length_1 = input(9, minval=1, title="Length", group=GP1, inline="10")
+i_src_1 = input(close, title="Source", group=GP1, inline="10")
+i_offset_1 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP1, inline="10")
 
 // ————— Functions
 
