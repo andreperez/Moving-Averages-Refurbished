@@ -17,7 +17,7 @@ var string HMA = "Hull"
 var string ALMA = "Arnaud Legoux"
 
 // ————— Average 1
-string GP1 = "Average 1"
+string GP1 = "Moving Average 1"
 string i_type_1 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP1, inline="10")
 color i_color_1 = input(color.blue, "", group=GP1, inline="10")
 int i_length_1 = input(9, minval=1, title="Length", group=GP1, inline="10")
@@ -25,12 +25,20 @@ i_src_1 = input(close, title="Source", group=GP1, inline="11")
 i_offset_1 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP1, inline="11")
 
 // ————— Average 2
-string GP2 = "Average 2"
+string GP2 = "Moving Average 2"
 string i_type_2 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP2, inline="12")
 color i_color_2 = input(color.red, "", group=GP2, inline="12")
 int i_length_2 = input(21, minval=1, title="Length", group=GP2, inline="12")
 i_src_2 = input(close, title="Source", group=GP2, inline="12")
 i_offset_2 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP2, inline="12")
+
+// ————— Average 3
+string GP3 = "Moving Average 3"
+string i_type_3 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP2, inline="13")
+color i_color_3 = input(color.yellow, "", group=GP2, inline="13")
+int i_length_3 = input(50, minval=1, title="Length", group=GP2, inline="13")
+i_src_3 = input(close, title="Source", group=GP2, inline="13")
+i_offset_3 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP2, inline="13")
 
 // ————— Functions
 
@@ -69,6 +77,7 @@ f_average(_type, _src, _len) =>
 // ————— Main
 plot( f_average(i_type_1, i_src_1, i_length_1), color=i_color_1, offset=i_offset_1 )
 plot( f_average(i_type_2, i_src_2, i_length_2), color=i_color_2, offset=i_offset_2 )
+plot( f_average(i_type_3, i_src_3, i_length_3), color=i_color_3, offset=i_offset_3 )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
