@@ -18,19 +18,19 @@ var string ALMA = "Arnaud Legoux"
 
 // ————— Periods
 var len_1 = 5
-var len_2 = 7
-var len_3 = 8
-var len_4 = 11
-var len_5 = 13
-var len_6 = 17
-var len_7 = 21
-var len_8 = 29
-var len_9 = 34
-var len_10 = 41
-var len_11 = 50
-var len_12 = 55
-var len_13 = 61
-var len_14 = 80
+var len_2 = 8
+var len_3 = 13
+var len_4 = 17
+var len_5 = 21
+var len_6 = 29
+var len_7 = 34
+var len_8 = 41
+var len_9 = 50
+var len_10 = 61
+var len_11 = 70
+var len_12 = 80
+var len_13 = 90
+var len_14 = 100
 var len_15 = 120
 var len_16 = 144
 var len_17 = 160
@@ -42,15 +42,15 @@ var len_22 = 365
 var len_23 = 377
 var len_24 = 610
 
-var color color_1   = #29ee24
-var color color_2   = #00e83d
-var color color_3   = #00e24e
-var color color_4   = #00dc5d
-var color color_5   = #00d569
-var color color_6   = #00ce74
-var color color_7   = #00c77d
-var color color_8   = #00c085
-var color color_9   = #00b98b
+var color color_01  = #29ee24
+var color color_02  = #00e83d
+var color color_03  = #00e24e
+var color color_04  = #00dc5d
+var color color_05  = #00d569
+var color color_06  = #00ce74
+var color color_07  = #00c77d
+var color color_08  = #00c085
+var color color_09  = #00b98b
 var color color_10  = #00b291
 var color color_11  = #00aa95
 var color color_12  = #00a397
@@ -69,7 +69,7 @@ var color color_24  = #2a4858
 
 // ————— Average 1
 bool    i_show_avg_1    = input(title="Moving Average 1", type=input.bool, defval=true, inline="10")
-color   i_color_1       = input(color_1, "", inline="10")
+color   i_color_1       = input(color_01, "", inline="10")
 string  i_type_1        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="11")
 int     i_length_1      = input(len_1, minval=1, title="Length", inline="11")
 float   i_src_1         = input(close, title="Source", inline="12")
@@ -77,7 +77,7 @@ int     i_offset_1      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 2
 bool    i_show_avg_2    = input(title="Moving Average 2", type=input.bool, defval=true, inline="13")
-color   i_color_2       = input(color_2, "", inline="13")
+color   i_color_2       = input(color_02, "", inline="13")
 string  i_type_2        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="14")
 int     i_length_2      = input(len_2, minval=1, title="Length", inline="14")
 float   i_src_2         = input(close, title="Source", inline="15")
@@ -85,7 +85,7 @@ int     i_offset_2      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 3
 bool    i_show_avg_3    = input(title="Moving Average 3", type=input.bool, defval=true, inline="16")
-color   i_color_3       = input(color_3, "", inline="16")
+color   i_color_3       = input(color_03, "", inline="16")
 string  i_type_3        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="17")
 int     i_length_3      = input(len_3, minval=1, title="Length", inline="17")
 float   i_src_3         = input(close, title="Source", inline="18")
@@ -93,7 +93,7 @@ int     i_offset_3      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 4
 bool    i_show_avg_4    = input(title="Moving Average 4", type=input.bool, defval=true, inline="19")
-color   i_color_4       = input(color_4, "", inline="19")
+color   i_color_4       = input(color_04, "", inline="19")
 string  i_type_4        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="20")
 int     i_length_4      = input(len_4, minval=1, title="Length", inline="20")
 float   i_src_4         = input(close, title="Source", inline="21")
@@ -101,7 +101,7 @@ int     i_offset_4      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 5
 bool    i_show_avg_5    = input(title="Moving Average 5", type=input.bool, defval=true, inline="22")
-color   i_color_5       = input(color_5, "", inline="22")
+color   i_color_5       = input(color_05, "", inline="22")
 string  i_type_5        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="23")
 int     i_length_5      = input(len_5, minval=1, title="Length", inline="23")
 float   i_src_5         = input(close, title="Source", inline="24")
@@ -109,7 +109,7 @@ int     i_offset_5      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 6
 bool    i_show_avg_6    = input(title="Moving Average 6", type=input.bool, defval=true, inline="25")
-color   i_color_6       = input(color_6, "", inline="25")
+color   i_color_6       = input(color_06, "", inline="25")
 string  i_type_6        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="26")
 int     i_length_6      = input(len_6, minval=1, title="Length", inline="26")
 float   i_src_6         = input(close, title="Source", inline="27")
@@ -117,7 +117,7 @@ int     i_offset_6      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 7
 bool    i_show_avg_7    = input(title="Moving Average 7", type=input.bool, defval=true, inline="28")
-color   i_color_7       = input(color_7, "", inline="28")
+color   i_color_7       = input(color_07, "", inline="28")
 string  i_type_7        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="29")
 int     i_length_7      = input(len_7, minval=1, title="Length", inline="29")
 float   i_src_7         = input(close, title="Source", inline="30")
@@ -125,7 +125,7 @@ int     i_offset_7      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 8
 bool    i_show_avg_8    = input(title="Moving Average 8", type=input.bool, defval=true, inline="31")
-color   i_color_8       = input(color_8, "", inline="31")
+color   i_color_8       = input(color_08, "", inline="31")
 string  i_type_8        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="32")
 int     i_length_8      = input(len_8, minval=1, title="Length", inline="32")
 float   i_src_8         = input(close, title="Source", inline="33")
@@ -133,11 +133,51 @@ int     i_offset_8      = input(title="Offset", type=input.integer, defval=0, mi
 
 // ————— Average 9
 bool    i_show_avg_9    = input(title="Moving Average 9", type=input.bool, defval=true, inline="34")
-color   i_color_9       = input(color_9, "", inline="34")
+color   i_color_9       = input(color_09, "", inline="34")
 string  i_type_9        = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="35")
 int     i_length_9      = input(len_9, minval=1, title="Length", inline="35")
 float   i_src_9         = input(close, title="Source", inline="36")
 int     i_offset_9      = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="36")
+
+// ————— Average 10
+bool    i_show_avg_10   = input(title="Moving Average 10", type=input.bool, defval=true, inline="37")
+color   i_color_10      = input(color_10, "", inline="37")
+string  i_type_10       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="38")
+int     i_length_10     = input(len_10, minval=1, title="Length", inline="38")
+float   i_src_10        = input(close, title="Source", inline="39")
+int     i_offset_10     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="39")
+
+// ————— Average 11
+bool    i_show_avg_11   = input(title="Moving Average 11", type=input.bool, defval=true, inline="40")
+color   i_color_11      = input(color_11, "", inline="40")
+string  i_type_11       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="41")
+int     i_length_11     = input(len_11, minval=1, title="Length", inline="41")
+float   i_src_11        = input(close, title="Source", inline="42")
+int     i_offset_11     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="42")
+
+// ————— Average 12
+bool    i_show_avg_12   = input(title="Moving Average 12", type=input.bool, defval=true, inline="43")
+color   i_color_12      = input(color_12, "", inline="43")
+string  i_type_12       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="44")
+int     i_length_12     = input(len_12, minval=1, title="Length", inline="44")
+float   i_src_12        = input(close, title="Source", inline="45")
+int     i_offset_12     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="45")
+
+// ————— Average 13
+bool    i_show_avg_13   = input(title="Moving Average 13", type=input.bool, defval=true, inline="46")
+color   i_color_13      = input(color_13, "", inline="46")
+string  i_type_13       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="47")
+int     i_length_13     = input(len_13, minval=1, title="Length", inline="47")
+float   i_src_13        = input(close, title="Source", inline="48")
+int     i_offset_13     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="48")
+
+// ————— Average 14
+bool    i_show_avg_14   = input(title="Moving Average 14", type=input.bool, defval=true, inline="49")
+color   i_color_14      = input(color_14, "", inline="49")
+string  i_type_14       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="50")
+int     i_length_14     = input(len_14, minval=1, title="Length", inline="50")
+float   i_src_14        = input(close, title="Source", inline="51")
+int     i_offset_14     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="51")
 
 // ————— Functions
 
@@ -183,6 +223,11 @@ plot( i_show_avg_6 ? f_average(i_type_6, i_src_6, i_length_6) : na, color=i_colo
 plot( i_show_avg_7 ? f_average(i_type_7, i_src_7, i_length_7) : na, color=i_color_7, offset=i_offset_7 )
 plot( i_show_avg_8 ? f_average(i_type_8, i_src_8, i_length_8) : na, color=i_color_8, offset=i_offset_8 )
 plot( i_show_avg_9 ? f_average(i_type_9, i_src_9, i_length_9) : na, color=i_color_9, offset=i_offset_9 )
+plot( i_show_avg_10 ? f_average(i_type_10, i_src_10, i_length_10) : na, color=i_color_10, offset=i_offset_10 )
+plot( i_show_avg_11 ? f_average(i_type_11, i_src_11, i_length_11) : na, color=i_color_11, offset=i_offset_11 )
+plot( i_show_avg_12 ? f_average(i_type_12, i_src_12, i_length_12) : na, color=i_color_12, offset=i_offset_12 )
+plot( i_show_avg_13 ? f_average(i_type_13, i_src_13, i_length_13) : na, color=i_color_13, offset=i_offset_13 )
+plot( i_show_avg_14 ? f_average(i_type_14, i_src_14, i_length_14) : na, color=i_color_14, offset=i_offset_14 )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
