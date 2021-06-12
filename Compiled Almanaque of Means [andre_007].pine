@@ -1,0 +1,113 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © andre_007
+
+//@version=4
+study("Compiled Almanaque of Means", overlay=true)
+
+offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
+
+// ————— Input options for Averages
+
+var string SMA = "Simple Moving Average"
+var string EMA = "Moving Average Exponential"
+var string DEMA = "Double EMA"
+var string TEMA = "Triple EMA"
+var string WMA = "Moving Average Weighted"
+var string SMMA = "Smoothed Moving Average"
+var string LSMA = "Least Squares Moving Average"
+var string HMA = "Hull Moving Average"
+var string ALMA = "Arnaud Legoux Moving Average"
+
+// ————— Average 1
+
+string i_average_1 = input(SMA, "Type of Moving Average", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA])
+int i_length_1 = input(9, minval=1, title="Length 1")
+i_src_1 = input(close, title="Source")
+
+// ————— Functions
+
+f_sma(_src, _len, _offset) =>
+    out = sma(_src, _len)
+
+f_ema(_src, _len, _offset) =>
+    out = ema(_src, _len)
+
+f_average(_type) =>
+    if _type == SMA
+        f_sma(i_src_1, i_length_1, offset)
+    else if _type == EMA
+        f_ema(i_src_1, i_length_1, offset)
+
+// ————— Main
+plot( f_average(i_average_1) )
+
+// study(title="Moving Average", shorttitle="MA", overlay=true, resolution="")
+// len = input(9, minval=1, title="Length")
+// src = input(close, title="Source")
+// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
+// out = sma(src, len)
+// plot(out, color=color.blue, title="MA", offset=offset)
+
+// study(title="Moving Average Exponential", shorttitle="EMA", overlay=true, resolution="")
+// len = input(9, minval=1, title="Length")
+// src = input(close, title="Source")
+// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
+// out = ema(src, len)
+// plot(out, title="EMA", color=color.blue, offset=offset)
+
+// study(title="Double EMA", shorttitle="DEMA", overlay=true, resolution="")
+// length = input(9, minval=1)
+// src = input(close, title="Source")
+// e1 = ema(src, length)
+// e2 = ema(e1, length)
+// dema = 2 * e1 - e2
+// plot(dema, "DEMA", color=#008000)
+
+// study(title="Triple EMA", shorttitle="TEMA", overlay=true, resolution="")
+// length = input(9, minval=1)
+// ema1 = ema(close, length)
+// ema2 = ema(ema1, length)
+// ema3 = ema(ema2, length)
+// out = 3 * (ema1 - ema2) + ema3
+// plot(out, "TEMA", color=#008000)
+
+// study(title="Moving Average Weighted", shorttitle="WMA", overlay=true, resolution="")
+// len = input(9, minval=1, title="Length")
+// src = input(close, title="Source")
+// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
+// out = wma(src, len)
+// plot(out, title="WMA", color=color.blue, offset=offset)
+
+// study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
+// len = input(7, minval=1, title="Length")
+// src = input(close, title="Source")
+// smma = 0.0
+// smma := na(smma[1]) ? sma(src, len) : (smma[1] * (len - 1) + src) / len
+// plot(smma, color=color.red)
+
+// study(title = "Least Squares Moving Average", shorttitle="LSMA", overlay=true, resolution="")
+// length = input(title="Length", type=input.integer, defval=25)
+// offset = input(title="Offset", type=input.integer, defval=0)
+// src = input(close, title="Source")
+// lsma = linreg(src, length, offset)
+// plot(lsma)
+
+// study(title="Hull Moving Average", shorttitle="HMA", overlay=true, resolution="")
+// length = input(9, minval=1)
+// src = input(close, title="Source")
+// hullma = wma(2*wma(src, length/2)-wma(src, length), floor(sqrt(length)))
+// plot(hullma)
+
+// study(title = "Arnaud Legoux Moving Average", shorttitle="ALMA", overlay=true, resolution="")
+// source = close
+// windowsize = input(title="Window Size", type=input.integer, defval=9)
+// offset = input(title="Offset", type=input.float, defval=0.85)
+// sigma = input(title="Sigma", type=input.float, defval=6)
+// plot(alma(source, windowsize, offset, sigma))
+
+// study(title = "Least Squares Moving Average", shorttitle="LSMA", overlay=true, resolution="")
+// length = input(title="Length", type=input.integer, defval=25)
+// offset = input(title="Offset", type=input.integer, defval=0)
+// src = input(close, title="Source")
+// lsma = linreg(src, length, offset)
+// plot(lsma)
