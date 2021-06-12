@@ -179,6 +179,22 @@ int     i_length_14     = input(len_14, minval=1, title="Length", inline="50")
 float   i_src_14        = input(close, title="Source", inline="51")
 int     i_offset_14     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="51")
 
+// ————— Average 15
+bool    i_show_avg_15   = input(title="Moving Average 15", type=input.bool, defval=true, inline="52")
+color   i_color_15      = input(color_15, "", inline="52")
+string  i_type_15       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="53")
+int     i_length_15     = input(len_15, minval=1, title="Length", inline="53")
+float   i_src_15        = input(close, title="Source", inline="54")
+int     i_offset_15     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="54")
+
+// ————— Average 16
+bool    i_show_avg_16   = input(title="Moving Average 16", type=input.bool, defval=true, inline="55")
+color   i_color_16      = input(color_16, "", inline="55")
+string  i_type_16       = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="56")
+int     i_length_16     = input(len_16, minval=1, title="Length", inline="56")
+float   i_src_16        = input(close, title="Source", inline="57")
+int     i_offset_16     = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="57")
+
 // ————— Functions
 
 f_sma(_src, _len) =>
@@ -228,6 +244,8 @@ plot( i_show_avg_11 ? f_average(i_type_11, i_src_11, i_length_11) : na, color=i_
 plot( i_show_avg_12 ? f_average(i_type_12, i_src_12, i_length_12) : na, color=i_color_12, offset=i_offset_12 )
 plot( i_show_avg_13 ? f_average(i_type_13, i_src_13, i_length_13) : na, color=i_color_13, offset=i_offset_13 )
 plot( i_show_avg_14 ? f_average(i_type_14, i_src_14, i_length_14) : na, color=i_color_14, offset=i_offset_14 )
+plot( i_show_avg_15 ? f_average(i_type_15, i_src_15, i_length_15) : na, color=i_color_15, offset=i_offset_15 )
+plot( i_show_avg_16 ? f_average(i_type_16, i_src_16, i_length_16) : na, color=i_color_16, offset=i_offset_16 )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
