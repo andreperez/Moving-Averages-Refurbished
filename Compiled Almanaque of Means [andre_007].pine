@@ -2,27 +2,35 @@
 // © andre_007
 
 //@version=4
-study("Compiled Almanaque of Means", overlay=true)
+study("Compiled Almanaque of Means", overlay=true, resolution="")
 
 // ————— Input options for Averages
 
-var string SMA = "Simple Moving Average"
-var string EMA = "Moving Average Exponential"
-var string DEMA = "Double EMA"
-var string TEMA = "Triple EMA"
-var string WMA = "Moving Average Weighted"
-var string SMMA = "Smoothed Moving Average"
-var string LSMA = "Least Squares Moving Average"
-var string HMA = "Hull Moving Average"
-var string ALMA = "Arnaud Legoux Moving Average"
+var string SMA = "Simple"
+var string EMA = "Exponential"
+var string DEMA = "Double Exponential"
+var string TEMA = "Triple Exponential"
+var string WMA = "Weighted"
+var string SMMA = "Smoothed"
+var string LSMA = "Least Squares"
+var string HMA = "Hull"
+var string ALMA = "Arnaud Legoux"
 
 // ————— Average 1
 string GP1 = "Average 1"
 string i_type_1 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP1, inline="10")
 color i_color_1 = input(color.blue, "", group=GP1, inline="10")
 int i_length_1 = input(9, minval=1, title="Length", group=GP1, inline="10")
-i_src_1 = input(close, title="Source", group=GP1, inline="10")
-i_offset_1 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP1, inline="10")
+i_src_1 = input(close, title="Source", group=GP1, inline="11")
+i_offset_1 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP1, inline="11")
+
+// ————— Average 2
+string GP2 = "Average 2"
+string i_type_2 = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], group=GP2, inline="12")
+color i_color_2 = input(color.red, "", group=GP2, inline="12")
+int i_length_2 = input(21, minval=1, title="Length", group=GP2, inline="12")
+i_src_2 = input(close, title="Source", group=GP2, inline="12")
+i_offset_2 = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, group=GP2, inline="12")
 
 // ————— Functions
 
@@ -32,51 +40,35 @@ f_sma(_src, _len) =>
 f_ema(_src, _len) =>
     out = ema(_src, _len)
 
+f_dema(_src, _len) =>
+    e1 = ema(_src, _len)
+    e2 = ema(e1, _len)
+    out = 2 * e1 - e2
+
+f_tema(_src, _len) =>
+    ema1 = ema(_src, _len)
+    ema2 = ema(ema1, _len)
+    ema3 = ema(ema2, _len)
+    out = 3 * (ema1 - ema2) + ema3
+
+f_wma(_src, _len) =>
+    out = wma(_src, _len)
+
 f_average(_type, _src, _len) =>
     if _type == SMA
         f_sma(_src, _len)
     else if _type == EMA
         f_ema(_src, _len)
+    else if _type == DEMA
+        f_dema(_src, _len)
+    else if _type == TEMA
+        f_tema(_src, _len)
+    else if _type == WMA
+        f_wma(_src, _len)
 
 // ————— Main
 plot( f_average(i_type_1, i_src_1, i_length_1), color=i_color_1, offset=i_offset_1 )
-
-// study(title="Moving Average", shorttitle="MA", overlay=true, resolution="")
-// len = input(9, minval=1, title="Length")
-// src = input(close, title="Source")
-// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
-// out = sma(src, len)
-// plot(out, color=color.blue, title="MA", offset=offset)
-
-// study(title="Moving Average Exponential", shorttitle="EMA", overlay=true, resolution="")
-// len = input(9, minval=1, title="Length")
-// src = input(close, title="Source")
-// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
-// out = ema(src, len)
-// plot(out, title="EMA", color=color.blue, offset=offset)
-
-// study(title="Double EMA", shorttitle="DEMA", overlay=true, resolution="")
-// length = input(9, minval=1)
-// src = input(close, title="Source")
-// e1 = ema(src, length)
-// e2 = ema(e1, length)
-// dema = 2 * e1 - e2
-// plot(dema, "DEMA", color=#008000)
-
-// study(title="Triple EMA", shorttitle="TEMA", overlay=true, resolution="")
-// length = input(9, minval=1)
-// ema1 = ema(close, length)
-// ema2 = ema(ema1, length)
-// ema3 = ema(ema2, length)
-// out = 3 * (ema1 - ema2) + ema3
-// plot(out, "TEMA", color=#008000)
-
-// study(title="Moving Average Weighted", shorttitle="WMA", overlay=true, resolution="")
-// len = input(9, minval=1, title="Length")
-// src = input(close, title="Source")
-// offset = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500)
-// out = wma(src, len)
-// plot(out, title="WMA", color=color.blue, offset=offset)
+plot( f_average(i_type_2, i_src_2, i_length_2), color=i_color_2, offset=i_offset_2 )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
