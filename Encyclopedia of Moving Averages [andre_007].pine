@@ -1,8 +1,8 @@
 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
-// © andre_007
+// @version=4
+// @author=andre_007
 
-//@version=4
-study(title="Encyclopedia of Moving Averages", shorttitle="Moving Averages", overlay=true, resolution="")
+study(title="Encyclopedia of Moving Averages", shorttitle="Moving Averages", format=format.inherit, overlay=true, resolution="")
 
 // ————— Input options for Averages
 
@@ -69,30 +69,31 @@ var len_23 = 377
 var len_24 = 610
 
 // ————— Colors
-var color color_01  = #29ee24
-var color color_02  = #00e83d
-var color color_03  = #00e24e
-var color color_04  = #00dc5d
-var color color_05  = #00d569
-var color color_06  = #00ce74
-var color color_07  = #00c77d
-var color color_08  = #00c085
-var color color_09  = #00b98b
-var color color_10  = #00b291
-var color color_11  = #00aa95
-var color color_12  = #00a397
-var color color_13  = #009b98
-var color color_14  = #009398
-var color color_15  = #008c97
-var color color_16  = #008494
-var color color_17  = #007c90
-var color color_18  = #00748b
-var color color_19  = #006d85
-var color color_20  = #00657d
-var color color_21  = #005e75
-var color color_22  = #0c566c
-var color color_23  = #204f62
-var color color_24  = #2a4858
+var color color_01 = #b9f2a6
+var color color_02 = #96ec79
+var color color_03 = #73e64c
+var color color_04 = #50df20
+var color color_05 = #40b319
+var color color_06 = #308613
+var color color_07 = #a6f2f2
+var color color_08 = #79ecec
+var color color_09 = #4ce6e6
+var color color_10 = #20dfdf
+var color color_11 = #19b3b3
+var color color_12 = #138686
+var color color_13 = #cce0ff
+var color color_14 = #99c2ff
+var color color_15 = #66a3ff
+var color color_16 = #3385ff
+var color color_17 = #0066ff
+var color color_18 = #0052cc
+var color color_19 = #ffccff
+var color color_20 = #ff99ff
+var color color_21 = #ff66ff
+var color color_22 = #ff33ff
+var color color_23 = #ff00ff
+var color color_24 = #cc00cc
+
 
 // ————— Params for all Moving Averages
 bool    i_same_avg    = input(title="Apply same type for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="If checked, individual types don't take effect")
@@ -291,7 +292,7 @@ if i_show_avg_16
 
 plot_16 = plot( i_show_avg_16 ? f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) : na, color=close >= f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) ?  i_color_16 : color.red, offset=i_offset_16 )
 
-fill(plot_1, plot_16, color = color.new(calc_1 > calc_16 ? i_color_1 : i_color_16, 80) )
+fill(plot_1, plot_16, color = color.new(calc_1 > calc_16 ? i_color_1 : i_color_16, 50) )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
