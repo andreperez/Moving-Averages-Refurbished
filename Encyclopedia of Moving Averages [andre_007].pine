@@ -2,7 +2,7 @@
 // © andre_007
 
 //@version=4
-study("Compiled Almanaque of Means", overlay=true, resolution="")
+study(title="Encyclopedia of Moving Averages", shorttitle="Moving Averages", overlay=true, resolution="")
 
 // ————— Input options for Averages
 
@@ -235,7 +235,7 @@ f_average(_type, _src, _len) =>
         f_wma(_src, _len)
 
 // ————— Main
-plot( i_show_avg_1 ? f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) : na, color=i_color_1, offset=i_offset_1 )
+plot_1 = plot( i_show_avg_1 ? f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) : na, color=close >= f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) ? i_color_1 : color.red, offset=i_offset_1 )
 plot( i_show_avg_2 ? f_average(i_same_avg ? i_type_all : i_type_2, i_src_2, i_length_2) : na, color=i_color_2, offset=i_offset_2 )
 plot( i_show_avg_3 ? f_average(i_same_avg ? i_type_all : i_type_3, i_src_3, i_length_3) : na, color=i_color_3, offset=i_offset_3 )
 plot( i_show_avg_4 ? f_average(i_same_avg ? i_type_all : i_type_4, i_src_4, i_length_4) : na, color=i_color_4, offset=i_offset_4 )
@@ -250,7 +250,9 @@ plot( i_show_avg_12 ? f_average(i_same_avg ? i_type_all : i_type_12, i_src_12, i
 plot( i_show_avg_13 ? f_average(i_same_avg ? i_type_all : i_type_13, i_src_13, i_length_13) : na, color=i_color_13, offset=i_offset_13 )
 plot( i_show_avg_14 ? f_average(i_same_avg ? i_type_all : i_type_14, i_src_14, i_length_14) : na, color=i_color_14, offset=i_offset_14 )
 plot( i_show_avg_15 ? f_average(i_same_avg ? i_type_all : i_type_15, i_src_15, i_length_15) : na, color=i_color_15, offset=i_offset_15 )
-plot( i_show_avg_16 ? f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) : na, color=i_color_16, offset=i_offset_16 )
+plot_16 = plot( i_show_avg_16 ? f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) : na, color=close >= f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) ?  i_color_16 : color.red, offset=i_offset_16 )
+
+// fill(plot_1, plot_16, color=color.new(color.red, 90))
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
