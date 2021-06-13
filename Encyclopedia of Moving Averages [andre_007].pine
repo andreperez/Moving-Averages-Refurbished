@@ -16,6 +16,32 @@ var string LSMA = "Least Squares"
 var string HMA  = "Hull"
 var string ALMA = "Arnaud Legoux"
 
+// ————— Calcs
+var float calc_1 = na
+float calc_2 = na
+float calc_3 = na
+float calc_4 = na
+float calc_5 = na
+float calc_6 = na
+float calc_7 = na
+float calc_8 = na
+float calc_9 = na
+float calc_10 = na
+float calc_11 = na
+float calc_12 = na
+float calc_13 = na
+float calc_14 = na
+float calc_15 = na
+float calc_16 = na
+float calc_17 = na
+float calc_18 = na
+float calc_19 = na
+float calc_20 = na
+float calc_21 = na
+float calc_22 = na
+float calc_23 = na
+float calc_24 = na
+
 // ————— Periods
 var len_1 = 5
 var len_2 = 8
@@ -42,6 +68,7 @@ var len_22 = 365
 var len_23 = 377
 var len_24 = 610
 
+// ————— Colors
 var color color_01  = #29ee24
 var color color_02  = #00e83d
 var color color_03  = #00e24e
@@ -67,9 +94,12 @@ var color color_22  = #0c566c
 var color color_23  = #204f62
 var color color_24  = #2a4858
 
+// ————— Params for all Moving Averages
 bool    i_same_avg    = input(title="Apply same type for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="If checked, individual types don't take effect")
 string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="09")
 
+
+// ————— Averages
 var string GROUP_AVG = "Moving Averages"
 
 // ————— Average 1
@@ -235,7 +265,12 @@ f_average(_type, _src, _len) =>
         f_wma(_src, _len)
 
 // ————— Main
-plot_1 = plot( i_show_avg_1 ? f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) : na, color=close >= f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) ? i_color_1 : color.red, offset=i_offset_1 )
+
+
+if i_show_avg_1
+    calc_1 := f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1)
+
+plot_1 = plot( calc_1, color=close >= f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1) ? i_color_1 : color.red, offset=i_offset_1 )
 plot( i_show_avg_2 ? f_average(i_same_avg ? i_type_all : i_type_2, i_src_2, i_length_2) : na, color=i_color_2, offset=i_offset_2 )
 plot( i_show_avg_3 ? f_average(i_same_avg ? i_type_all : i_type_3, i_src_3, i_length_3) : na, color=i_color_3, offset=i_offset_3 )
 plot( i_show_avg_4 ? f_average(i_same_avg ? i_type_all : i_type_4, i_src_4, i_length_4) : na, color=i_color_4, offset=i_offset_4 )
@@ -250,9 +285,13 @@ plot( i_show_avg_12 ? f_average(i_same_avg ? i_type_all : i_type_12, i_src_12, i
 plot( i_show_avg_13 ? f_average(i_same_avg ? i_type_all : i_type_13, i_src_13, i_length_13) : na, color=i_color_13, offset=i_offset_13 )
 plot( i_show_avg_14 ? f_average(i_same_avg ? i_type_all : i_type_14, i_src_14, i_length_14) : na, color=i_color_14, offset=i_offset_14 )
 plot( i_show_avg_15 ? f_average(i_same_avg ? i_type_all : i_type_15, i_src_15, i_length_15) : na, color=i_color_15, offset=i_offset_15 )
+
+if i_show_avg_16
+    calc_16 := f_average(i_same_avg ? i_type_all : i_type_1, i_src_16, i_length_16)
+
 plot_16 = plot( i_show_avg_16 ? f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) : na, color=close >= f_average(i_same_avg ? i_type_all : i_type_16, i_src_16, i_length_16) ?  i_color_16 : color.red, offset=i_offset_16 )
 
-// fill(plot_1, plot_16, color=color.new(color.red, 90))
+fill(plot_1, plot_16, color = color.new(calc_1 > calc_16 ? i_color_1 : i_color_16, 80) )
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
 // len = input(7, minval=1, title="Length")
