@@ -148,8 +148,10 @@ var color COLOR_BULL_23 = #ff00ff
 var color COLOR_BULL_24 = #cc00cc
 
 // ————— Params for all Moving Averages
-bool    i_same_avg    = input(title="Apply same type for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="If checked, individual types don't take effect")
-string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="09")
+bool    i_same_params = input(title="Apply same parameters for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="If checked, individual types don't take effect", inline="01")
+string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="02")
+float   i_src_all     = input(close, title="Source", inline="02")
+int     i_offset_all  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="02")
 
 
 // ————— Averages
@@ -317,58 +319,66 @@ f_average(_type, _src, _len) =>
     else if _type == WMA
         f_wma(_src, _len)
 
+f_apply_type(_type) =>
+    type_out = i_same_params ? i_type_all : _type
+
+f_apply_src(_src) =>
+    src_out = i_same_params ? i_src_all : _src
+
+f_apply_offset(_offset) =>
+    offset_out = i_same_params ? i_offset_all : _offset
+
 // ————— Main
 
-
 if i_show_avg_1
-    calc_1 := f_average(i_same_avg ? i_type_all : i_type_1, i_src_1, i_length_1)
+    calc_1  := f_average( f_apply_type(i_type_1), f_apply_src(i_src_1), i_length_1 )
 if i_show_avg_2
-    calc_2 := f_average(i_same_avg ? i_type_all : i_type_2, i_src_2, i_length_2)
+    calc_2  := f_average( f_apply_type(i_type_2), f_apply_src(i_src_2), i_length_2 )
 if i_show_avg_3
-    calc_3 := f_average(i_same_avg ? i_type_all : i_type_3, i_src_3, i_length_3)
+    calc_3  := f_average( f_apply_type(i_type_3), f_apply_src(i_src_3), i_length_3 )
 if i_show_avg_4
-    calc_4 := f_average(i_same_avg ? i_type_all : i_type_4, i_src_4, i_length_4)
+    calc_4  := f_average( f_apply_type(i_type_4), f_apply_src(i_src_4), i_length_4 )
 if i_show_avg_5
-    calc_5 := f_average(i_same_avg ? i_type_all : i_type_5, i_src_5, i_length_5)
+    calc_5  := f_average( f_apply_type(i_type_5), f_apply_src(i_src_5), i_length_5 )
 if i_show_avg_6
-    calc_6 := f_average(i_same_avg ? i_type_all : i_type_6, i_src_6, i_length_6)
+    calc_6  := f_average( f_apply_type(i_type_6), f_apply_src(i_src_6), i_length_6 )
 if i_show_avg_7
-    calc_7 := f_average(i_same_avg ? i_type_all : i_type_7, i_src_7, i_length_7)    
+    calc_7  := f_average( f_apply_type(i_type_7), f_apply_src(i_src_7), i_length_7 )    
 if i_show_avg_8
-    calc_8 := f_average(i_same_avg ? i_type_all : i_type_8, i_src_8, i_length_8)    
+    calc_8  := f_average( f_apply_type(i_type_8), f_apply_src(i_src_8), i_length_8 )    
 if i_show_avg_9
-    calc_9 := f_average(i_same_avg ? i_type_all : i_type_9, i_src_9, i_length_9)    
+    calc_19 := f_average( f_apply_type(i_type_9), f_apply_src(i_src_9), i_length_9 )    
 if i_show_avg_10
-    calc_10 := f_average(i_same_avg ? i_type_all : i_type_10, i_src_10, i_length_10)
+    calc_10 := f_average( f_apply_type(i_type_10), f_apply_src(i_src_10), i_length_10 )
 if i_show_avg_11
-    calc_11 := f_average(i_same_avg ? i_type_all : i_type_11, i_src_11, i_length_11)    
+    calc_11 := f_average( f_apply_type(i_type_11), f_apply_src(i_src_11), i_length_11 )    
 if i_show_avg_12
-    calc_12 := f_average(i_same_avg ? i_type_all : i_type_12, i_src_12, i_length_12)    
+    calc_12 := f_average( f_apply_type(i_type_12), f_apply_src(i_src_12), i_length_12 )    
 if i_show_avg_13
-    calc_13 := f_average(i_same_avg ? i_type_all : i_type_13, i_src_13, i_length_13)    
+    calc_13 := f_average( f_apply_type(i_type_13), f_apply_src(i_src_13), i_length_13 )    
 if i_show_avg_14
-    calc_14 := f_average(i_same_avg ? i_type_all : i_type_14, i_src_14, i_length_14)    
+    calc_14 := f_average( f_apply_type(i_type_14), f_apply_src(i_src_14), i_length_14 )    
 if i_show_avg_15
-    calc_15 := f_average(i_same_avg ? i_type_all : i_type_15, i_src_15, i_length_15)    
+    calc_15 := f_average( f_apply_type(i_type_15), f_apply_src(i_src_15), i_length_15 )  
 if i_show_avg_16
-    calc_16 := f_average(i_same_avg ? i_type_all : i_type_1, i_src_16, i_length_16)    
+    calc_16 := f_average( f_apply_type(i_type_16), f_apply_src(i_src_16), i_length_16)
 
-plot_1  = plot( calc_1,  color=close>=calc_1  ? array.get(a_colors_bull, 0)  : array.get(a_colors_bear, 0),  offset=i_offset_1 )
-plot_2  = plot( calc_2,  color=close>=calc_2  ? array.get(a_colors_bull, 1)  : array.get(a_colors_bear, 1),  offset=i_offset_2 )
-plot_3  = plot( calc_3,  color=close>=calc_3  ? array.get(a_colors_bull, 2)  : array.get(a_colors_bear, 2),  offset=i_offset_3 )
-plot_4  = plot( calc_4,  color=close>=calc_4  ? array.get(a_colors_bull, 3)  : array.get(a_colors_bear, 3),  offset=i_offset_4 )
-plot_5  = plot( calc_5,  color=close>=calc_5  ? array.get(a_colors_bull, 4)  : array.get(a_colors_bear, 4),  offset=i_offset_5 )
-plot_6  = plot( calc_6,  color=close>=calc_6  ? array.get(a_colors_bull, 5)  : array.get(a_colors_bear, 5),  offset=i_offset_6 )
-plot_7  = plot( calc_7,  color=close>=calc_7  ? array.get(a_colors_bull, 6)  : array.get(a_colors_bear, 6),  offset=i_offset_7 )
-plot_8  = plot( calc_8,  color=close>=calc_8  ? array.get(a_colors_bull, 7)  : array.get(a_colors_bear, 7),  offset=i_offset_8 )
-plot_9  = plot( calc_9,  color=close>=calc_9  ? array.get(a_colors_bull, 8)  : array.get(a_colors_bear, 8),  offset=i_offset_9 )
-plot_10 = plot( calc_10, color=close>=calc_10 ? array.get(a_colors_bull, 9)  : array.get(a_colors_bear, 9),  offset=i_offset_10 )
-plot_11 = plot( calc_11, color=close>=calc_11 ? array.get(a_colors_bull, 10) : array.get(a_colors_bear, 10), offset=i_offset_11 )
-plot_12 = plot( calc_12, color=close>=calc_12 ? array.get(a_colors_bull, 11) : array.get(a_colors_bear, 11), offset=i_offset_12 )
-plot_13 = plot( calc_13, color=close>=calc_13 ? array.get(a_colors_bull, 12) : array.get(a_colors_bear, 12), offset=i_offset_13 )
-plot_14 = plot( calc_14, color=close>=calc_14 ? array.get(a_colors_bull, 13) : array.get(a_colors_bear, 13), offset=i_offset_14 )
-plot_15 = plot( calc_15, color=close>=calc_15 ? array.get(a_colors_bull, 14) : array.get(a_colors_bear, 14), offset=i_offset_15 )
-plot_16 = plot( calc_16, color=close>=calc_16 ? array.get(a_colors_bull, 15) : array.get(a_colors_bear, 15), offset=i_offset_16 )
+plot_1  = plot( calc_1,  color=close>=calc_1  ? array.get(a_colors_bull, 0)  : array.get(a_colors_bear, 0),  offset=f_apply_offset(i_offset_1) )
+plot_2  = plot( calc_2,  color=close>=calc_2  ? array.get(a_colors_bull, 1)  : array.get(a_colors_bear, 1),  offset=f_apply_offset(i_offset_2) )
+plot_3  = plot( calc_3,  color=close>=calc_3  ? array.get(a_colors_bull, 2)  : array.get(a_colors_bear, 2),  offset=f_apply_offset(i_offset_3) )
+plot_4  = plot( calc_4,  color=close>=calc_4  ? array.get(a_colors_bull, 3)  : array.get(a_colors_bear, 3),  offset=f_apply_offset(i_offset_4) )
+plot_5  = plot( calc_5,  color=close>=calc_5  ? array.get(a_colors_bull, 4)  : array.get(a_colors_bear, 4),  offset=f_apply_offset(i_offset_5) )
+plot_6  = plot( calc_6,  color=close>=calc_6  ? array.get(a_colors_bull, 5)  : array.get(a_colors_bear, 5),  offset=f_apply_offset(i_offset_6) )
+plot_7  = plot( calc_7,  color=close>=calc_7  ? array.get(a_colors_bull, 6)  : array.get(a_colors_bear, 6),  offset=f_apply_offset(i_offset_7) )
+plot_8  = plot( calc_8,  color=close>=calc_8  ? array.get(a_colors_bull, 7)  : array.get(a_colors_bear, 7),  offset=f_apply_offset(i_offset_8) )
+plot_9  = plot( calc_9,  color=close>=calc_9  ? array.get(a_colors_bull, 8)  : array.get(a_colors_bear, 8),  offset=f_apply_offset(i_offset_9) )
+plot_10 = plot( calc_10, color=close>=calc_10 ? array.get(a_colors_bull, 9)  : array.get(a_colors_bear, 9),  offset=f_apply_offset(i_offset_10) )
+plot_11 = plot( calc_11, color=close>=calc_11 ? array.get(a_colors_bull, 10) : array.get(a_colors_bear, 10), offset=f_apply_offset(i_offset_11) )
+plot_12 = plot( calc_12, color=close>=calc_12 ? array.get(a_colors_bull, 11) : array.get(a_colors_bear, 11), offset=f_apply_offset(i_offset_12) )
+plot_13 = plot( calc_13, color=close>=calc_13 ? array.get(a_colors_bull, 12) : array.get(a_colors_bear, 12), offset=f_apply_offset(i_offset_13) )
+plot_14 = plot( calc_14, color=close>=calc_14 ? array.get(a_colors_bull, 13) : array.get(a_colors_bear, 13), offset=f_apply_offset(i_offset_14) )
+plot_15 = plot( calc_15, color=close>=calc_15 ? array.get(a_colors_bull, 14) : array.get(a_colors_bear, 14), offset=f_apply_offset(i_offset_15) )
+plot_16 = plot( calc_16, color=close>=calc_16 ? array.get(a_colors_bull, 15) : array.get(a_colors_bear, 15), offset=f_apply_offset(i_offset_16) )
 
 fill(plot_1,  plot_2,  color = color.new(calc_1 > calc_2   ? array.get(a_colors_bull, 0)  : array.get(a_colors_bear, 0),  30) )
 fill(plot_2,  plot_3,  color = color.new(calc_2 > calc_3   ? array.get(a_colors_bull, 1)  : array.get(a_colors_bear, 1),  35) )
