@@ -54,25 +54,25 @@ var len_2 = 8
 var len_3 = 13
 var len_4 = 17
 var len_5 = 21
-var len_6 = 29
-var len_7 = 34
-var len_8 = 41
-var len_9 = 50
-var len_10 = 61
-var len_11 = 70
-var len_12 = 80
-var len_13 = 90
-var len_14 = 100
-var len_15 = 120
-var len_16 = 144
-var len_17 = 160
-var len_18 = 180
-var len_19 = 200
-var len_20 = 233
-var len_21 = 250
-var len_22 = 365
-var len_23 = 377
-var len_24 = 610
+var len_6 = 34
+var len_7 = 50
+var len_8 = 60
+var len_9 = 80
+var len_10 = 100
+var len_11 = 120
+var len_12 = 140
+var len_13 = 180
+var len_14 = 200
+var len_15 = 220
+var len_16 = 240
+var len_17 = 260
+var len_18 = 280
+var len_19 = 300
+var len_20 = 320
+var len_21 = 340
+var len_22 = 360
+var len_23 = 380
+var len_24 = 400
 
 //-----------------------------------------------------------
 // Colors
@@ -490,28 +490,28 @@ plot_24 = plot( calc_24, color=close>=calc_24 ? array.get(a_colors_bull, 23) : a
 //-----------------------------------------------------------
 // Fills
 //-----------------------------------------------------------
-fill(plot_1,  plot_2,  color = color.new(calc_1 > calc_2   ? array.get(a_colors_bull, 0)  : array.get(a_colors_bear, 0),  30) )
-fill(plot_2,  plot_3,  color = color.new(calc_2 > calc_3   ? array.get(a_colors_bull, 1)  : array.get(a_colors_bear, 1),  35) )
-fill(plot_3,  plot_4,  color = color.new(calc_3 > calc_4   ? array.get(a_colors_bull, 2)  : array.get(a_colors_bear, 2),  40) )
-fill(plot_4,  plot_5,  color = color.new(calc_4 > calc_5   ? array.get(a_colors_bull, 3)  : array.get(a_colors_bear, 3),  45) )
-fill(plot_5,  plot_6,  color = color.new(calc_5 > calc_6   ? array.get(a_colors_bull, 4)  : array.get(a_colors_bear, 4),  50) )
-fill(plot_6,  plot_7,  color = color.new(calc_6 > calc_7   ? array.get(a_colors_bull, 5)  : array.get(a_colors_bear, 5),  55) )
-fill(plot_7,  plot_8,  color = color.new(calc_7 > calc_8   ? array.get(a_colors_bull, 6)  : array.get(a_colors_bear, 6),  60) )
-fill(plot_8,  plot_9,  color = color.new(calc_8 > calc_9   ? array.get(a_colors_bull, 7)  : array.get(a_colors_bear, 7),  65) )
-fill(plot_9,  plot_10, color = color.new(calc_9 > calc_10  ? array.get(a_colors_bull, 8)  : array.get(a_colors_bear, 8),  70) )
-fill(plot_10, plot_11, color = color.new(calc_10 > calc_11 ? array.get(a_colors_bull, 9)  : array.get(a_colors_bear, 9),  70) )
-fill(plot_11, plot_12, color = color.new(calc_11 > calc_12 ? array.get(a_colors_bull, 10) : array.get(a_colors_bear, 10), 70) )
-fill(plot_12, plot_13, color = color.new(calc_12 > calc_13 ? array.get(a_colors_bull, 11) : array.get(a_colors_bear, 11), 70) )
-fill(plot_13, plot_14, color = color.new(calc_13 > calc_14 ? array.get(a_colors_bull, 12) : array.get(a_colors_bear, 12), 70) )
-fill(plot_14, plot_15, color = color.new(calc_14 > calc_15 ? array.get(a_colors_bull, 13) : array.get(a_colors_bear, 13), 70) )
-fill(plot_15, plot_16, color = color.new(calc_15 > calc_16 ? array.get(a_colors_bull, 14) : array.get(a_colors_bear, 14), 70) )
-fill(plot_16, plot_17, color = color.new(calc_16 > calc_17 ? array.get(a_colors_bull, 15) : array.get(a_colors_bear, 15), 70) )
-fill(plot_17, plot_18, color = color.new(calc_17 > calc_18 ? array.get(a_colors_bull, 16) : array.get(a_colors_bear, 16), 70) )
-fill(plot_18, plot_19, color = color.new(calc_18 > calc_19 ? array.get(a_colors_bull, 17) : array.get(a_colors_bear, 17), 70) )
-fill(plot_19, plot_20, color = color.new(calc_19 > calc_20 ? array.get(a_colors_bull, 18) : array.get(a_colors_bear, 18), 70) )
-fill(plot_20, plot_21, color = color.new(calc_20 > calc_21 ? array.get(a_colors_bull, 19) : array.get(a_colors_bear, 19), 70) )
-fill(plot_21, plot_22, color = color.new(calc_21 > calc_22 ? array.get(a_colors_bull, 20) : array.get(a_colors_bear, 20), 70) )
-fill(plot_22, plot_23, color = color.new(calc_22 > calc_23 ? array.get(a_colors_bull, 21) : array.get(a_colors_bear, 21), 70) )
+// fill(plot_1,  plot_2,  color = color.new(calc_1 > calc_2   ? array.get(a_colors_bull, 0)  : array.get(a_colors_bear, 0),  30) )
+// fill(plot_2,  plot_3,  color = color.new(calc_2 > calc_3   ? array.get(a_colors_bull, 1)  : array.get(a_colors_bear, 1),  35) )
+// fill(plot_3,  plot_4,  color = color.new(calc_3 > calc_4   ? array.get(a_colors_bull, 2)  : array.get(a_colors_bear, 2),  40) )
+// fill(plot_4,  plot_5,  color = color.new(calc_4 > calc_5   ? array.get(a_colors_bull, 3)  : array.get(a_colors_bear, 3),  45) )
+// fill(plot_5,  plot_6,  color = color.new(calc_5 > calc_6   ? array.get(a_colors_bull, 4)  : array.get(a_colors_bear, 4),  50) )
+// fill(plot_6,  plot_7,  color = color.new(calc_6 > calc_7   ? array.get(a_colors_bull, 5)  : array.get(a_colors_bear, 5),  55) )
+// fill(plot_7,  plot_8,  color = color.new(calc_7 > calc_8   ? array.get(a_colors_bull, 6)  : array.get(a_colors_bear, 6),  60) )
+// fill(plot_8,  plot_9,  color = color.new(calc_8 > calc_9   ? array.get(a_colors_bull, 7)  : array.get(a_colors_bear, 7),  65) )
+// fill(plot_9,  plot_10, color = color.new(calc_9 > calc_10  ? array.get(a_colors_bull, 8)  : array.get(a_colors_bear, 8),  70) )
+// fill(plot_10, plot_11, color = color.new(calc_10 > calc_11 ? array.get(a_colors_bull, 9)  : array.get(a_colors_bear, 9),  70) )
+// fill(plot_11, plot_12, color = color.new(calc_11 > calc_12 ? array.get(a_colors_bull, 10) : array.get(a_colors_bear, 10), 70) )
+// fill(plot_12, plot_13, color = color.new(calc_12 > calc_13 ? array.get(a_colors_bull, 11) : array.get(a_colors_bear, 11), 70) )
+// fill(plot_13, plot_14, color = color.new(calc_13 > calc_14 ? array.get(a_colors_bull, 12) : array.get(a_colors_bear, 12), 70) )
+// fill(plot_14, plot_15, color = color.new(calc_14 > calc_15 ? array.get(a_colors_bull, 13) : array.get(a_colors_bear, 13), 70) )
+// fill(plot_15, plot_16, color = color.new(calc_15 > calc_16 ? array.get(a_colors_bull, 14) : array.get(a_colors_bear, 14), 70) )
+// fill(plot_16, plot_17, color = color.new(calc_16 > calc_17 ? array.get(a_colors_bull, 15) : array.get(a_colors_bear, 15), 70) )
+// fill(plot_17, plot_18, color = color.new(calc_17 > calc_18 ? array.get(a_colors_bull, 16) : array.get(a_colors_bear, 16), 70) )
+// fill(plot_18, plot_19, color = color.new(calc_18 > calc_19 ? array.get(a_colors_bull, 17) : array.get(a_colors_bear, 17), 70) )
+// fill(plot_19, plot_20, color = color.new(calc_19 > calc_20 ? array.get(a_colors_bull, 18) : array.get(a_colors_bear, 18), 70) )
+// fill(plot_20, plot_21, color = color.new(calc_20 > calc_21 ? array.get(a_colors_bull, 19) : array.get(a_colors_bear, 19), 70) )
+// fill(plot_21, plot_22, color = color.new(calc_21 > calc_22 ? array.get(a_colors_bull, 20) : array.get(a_colors_bear, 20), 70) )
+// fill(plot_22, plot_23, color = color.new(calc_22 > calc_23 ? array.get(a_colors_bull, 21) : array.get(a_colors_bear, 21), 70) )
 
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
