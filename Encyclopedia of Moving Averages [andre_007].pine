@@ -91,7 +91,7 @@ var color COLOR_BEAR_14 = #ff62f4
 // Params for all Moving Averages
 //-----------------------------------------------------------
 var string GROUP_ALL = "Params for all Moving Averages"
-bool    i_same_params = input(title="Same parameters for all moving averages?", type=input.bool, defval=true, tooltip="Check this to apply same type, source and offset for all moving averages", inline="02" group=GROUP_ALL)
+bool    i_same_params = input(title="Same parameters for all moving averages?", type=input.bool, defval=true, tooltip="Check this to apply same type, source and offset for all moving averages", inline="02", group=GROUP_ALL)
 string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="03", group=GROUP_ALL)
 float   i_src_all     = input(close, title="Source", inline="03", group=GROUP_ALL)
 int     i_offset_all  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="03", group=GROUP_ALL)
@@ -246,7 +246,7 @@ f_wma(_src, _len) =>
 
 f_smma(_src, _len) =>
     smma = 0.0
-    smma := na(smma[1]) ? sma(src, len) : (smma[1] * (len - 1) + src) / len
+    smma := na(smma[1]) ? sma(_src, _len) : (smma[1] * (_len - 1) + _src) / _len
 
 f_lsma(_src, _len) =>
     out = linreg(_src, _len, 0)
@@ -255,7 +255,7 @@ f_hullma(_src, _len) =>
     out = wma(2*wma(_src, _len/2)-wma(_src, _len), floor(sqrt(_len)))
 
 f_alma(_src, _len) =>
-    out = alma(_src, _len, alma_offset, alma_sigma))
+    out = alma(_src, _len, alma_offset, alma_sigma)
 
 f_average(_type, _src, _len) =>
     if _type == SMA
@@ -273,7 +273,7 @@ f_average(_type, _src, _len) =>
     else if _type == LSMA
         f_lsma(_src, _len)
     else if _type == HMA
-        f_hma(_src, _len)
+        f_hullma(_src, _len)
     else if _type == ALMA
         f_alma(_src, _len)
 
