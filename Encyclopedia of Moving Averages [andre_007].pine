@@ -94,7 +94,7 @@ bool    i_same_params = input(title="Same parameters for all moving averages?", 
 string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="03")
 float   i_src_all     = input(close, title="Source", inline="03")
 int     i_offset_all  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="03")
-bool    i_fill        = input(title="Background fill", type=input.bool, defval=true, inline="03")
+bool    i_fill        = input(title="Fill background between averages?", type=input.bool, defval=true, inline="03")
 
 //-----------------------------------------------------------
 // Averages
@@ -310,19 +310,19 @@ plot_14 = plot( calc_14, color=close>=calc_14 ? COLOR_BULL_14 : COLOR_BEAR_14, o
 //-----------------------------------------------------------
 // Fills
 //-----------------------------------------------------------
-fill(plot_1,  plot_2,  color = color.new(calc_1 > calc_2   ? COLOR_BULL_01 : COLOR_BEAR_02, 85) )
-fill(plot_2,  plot_3,  color = color.new(calc_2 > calc_3   ? COLOR_BULL_02 : COLOR_BEAR_03, 86) )
-fill(plot_3,  plot_4,  color = color.new(calc_3 > calc_4   ? COLOR_BULL_03 : COLOR_BEAR_04, 87) )
-fill(plot_4,  plot_5,  color = color.new(calc_4 > calc_5   ? COLOR_BULL_04 : COLOR_BEAR_05, 88) )
-fill(plot_5,  plot_6,  color = color.new(calc_5 > calc_6   ? COLOR_BULL_05 : COLOR_BEAR_06, 89) )
-fill(plot_6,  plot_7,  color = color.new(calc_6 > calc_7   ? COLOR_BULL_06 : COLOR_BEAR_07, 90) )
-fill(plot_7,  plot_8,  color = color.new(calc_7 > calc_8   ? COLOR_BULL_07 : COLOR_BEAR_08, 91) )
-fill(plot_8,  plot_9,  color = color.new(calc_8 > calc_9   ? COLOR_BULL_08 : COLOR_BEAR_09, 92) )
-fill(plot_9,  plot_10, color = color.new(calc_9 > calc_10  ? COLOR_BULL_09 : COLOR_BEAR_10, 93) )
-fill(plot_10, plot_11, color = color.new(calc_10 > calc_11 ? COLOR_BULL_10 : COLOR_BEAR_11, 94) )
-fill(plot_11, plot_12, color = color.new(calc_11 > calc_12 ? COLOR_BULL_11 : COLOR_BEAR_12, 95) )
-fill(plot_12, plot_13, color = color.new(calc_12 > calc_13 ? COLOR_BULL_12 : COLOR_BEAR_13, 95) )
-fill(plot_13, plot_14, color = color.new(calc_13 > calc_14 ? COLOR_BULL_13 : COLOR_BEAR_14, 95) )
+fill(plot_1,  plot_2,  color=i_fill ? (color.new(calc_1 > calc_2   ? COLOR_BULL_01 : COLOR_BEAR_02, 85)) : na )
+fill(plot_2,  plot_3,  color=i_fill ? (color.new(calc_2 > calc_3   ? COLOR_BULL_02 : COLOR_BEAR_03, 86)) : na )
+fill(plot_3,  plot_4,  color=i_fill ? (color.new(calc_3 > calc_4   ? COLOR_BULL_03 : COLOR_BEAR_04, 87)) : na )
+fill(plot_4,  plot_5,  color=i_fill ? (color.new(calc_4 > calc_5   ? COLOR_BULL_04 : COLOR_BEAR_05, 88)) : na )
+fill(plot_5,  plot_6,  color=i_fill ? (color.new(calc_5 > calc_6   ? COLOR_BULL_05 : COLOR_BEAR_06, 89)) : na )
+fill(plot_6,  plot_7,  color=i_fill ? (color.new(calc_6 > calc_7   ? COLOR_BULL_06 : COLOR_BEAR_07, 90)) : na )
+fill(plot_7,  plot_8,  color=i_fill ? (color.new(calc_7 > calc_8   ? COLOR_BULL_07 : COLOR_BEAR_08, 91)) : na )
+fill(plot_8,  plot_9,  color=i_fill ? (color.new(calc_8 > calc_9   ? COLOR_BULL_08 : COLOR_BEAR_09, 92)) : na )
+fill(plot_9,  plot_10, color=i_fill ? (color.new(calc_9 > calc_10  ? COLOR_BULL_09 : COLOR_BEAR_10, 93)) : na )
+fill(plot_10, plot_11, color=i_fill ? (color.new(calc_10 > calc_11 ? COLOR_BULL_10 : COLOR_BEAR_11, 94)) : na )
+fill(plot_11, plot_12, color=i_fill ? (color.new(calc_11 > calc_12 ? COLOR_BULL_11 : COLOR_BEAR_12, 95)) : na )
+fill(plot_12, plot_13, color=i_fill ? (color.new(calc_12 > calc_13 ? COLOR_BULL_12 : COLOR_BEAR_13, 95)) : na )
+fill(plot_13, plot_14, color=i_fill ? (color.new(calc_13 > calc_14 ? COLOR_BULL_13 : COLOR_BEAR_14, 95)) : na )
 
 
 // study(title="Smoothed Moving Average", shorttitle="SMMA", overlay=true, resolution="")
