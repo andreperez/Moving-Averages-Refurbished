@@ -148,7 +148,7 @@ var color COLOR_BULL_23 = #ff00ff
 var color COLOR_BULL_24 = #cc00cc
 
 // ————— Params for all Moving Averages
-bool    i_same_params = input(title="Apply same parameters for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="If checked, individual types don't take effect", inline="01")
+bool    i_same_params = input(title="Same parameters for all moving averages?", type=input.bool, defval=true, inline="08", tooltip="Check this to apply same type, source and offset for all moving averages", inline="01")
 string  i_type_all    = input(SMA, "Type", options=[SMA, EMA, DEMA, TEMA, WMA, SMMA, LSMA, HMA, ALMA], inline="02")
 float   i_src_all     = input(close, title="Source", inline="02")
 int     i_offset_all  = input(title="Offset", type=input.integer, defval=0, minval=-500, maxval=500, inline="02")
@@ -347,7 +347,7 @@ if i_show_avg_7
 if i_show_avg_8
     calc_8  := f_average( f_apply_type(i_type_8), f_apply_src(i_src_8), i_length_8 )    
 if i_show_avg_9
-    calc_19 := f_average( f_apply_type(i_type_9), f_apply_src(i_src_9), i_length_9 )    
+    calc_9 := f_average( f_apply_type(i_type_9), f_apply_src(i_src_9), i_length_9 )    
 if i_show_avg_10
     calc_10 := f_average( f_apply_type(i_type_10), f_apply_src(i_src_10), i_length_10 )
 if i_show_avg_11
