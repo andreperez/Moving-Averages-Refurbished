@@ -316,7 +316,7 @@ if i_show_avg_12
 if i_show_avg_13
     calc_13 := f_average( f_apply_type(i_type_13), f_apply_src(i_src_13), i_length_13 )    
 if i_show_avg_14
-    calc_14 := f_average( f_apply_type(i_type_14), f_apply_src(i_src_14), i_length_14 )     
+    calc_14 := f_average( f_apply_type(i_type_14), f_apply_src(i_src_14), i_length_14 )
 
 //-----------------------------------------------------------
 // Plots
