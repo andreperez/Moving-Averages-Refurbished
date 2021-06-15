@@ -2,7 +2,7 @@
 
 ## Moving Averages Collection
 
-## Summary 📌
+## Summary 💊
 
 This is a collection of moving averages indicators.
 It's developed in PineScript for the technical analysis platform of **TradingView**.
@@ -16,7 +16,7 @@ This can be tedius, requiring the inclusion or removal of the indicators every t
 Basically, what this script does, is to allow the dynamic use of these indicators.
 That is, it is possible to choose the type of moving average as needed, facilitating the comparison and creation of setups.
 
-## Caution 💣
+## Caution 💊
 
 No technical indicators are 100% accurate as they can sometimes generate false signals.
 
@@ -24,7 +24,17 @@ You should never rely on a single indicator and always use a range of them when 
 
 ---
 
-## Definitions 📗
+## How to use this tool 💊
+
+Simply choose the type desired as the figure.
+In all are fourteen moving averages.
+There is also the possibility of choosing the indidual type of each.
+
+![alt](images/10-Params_1.png)
+
+---
+
+## Definitions 💊
 
 ### 1. Moving Averages 📈
 
