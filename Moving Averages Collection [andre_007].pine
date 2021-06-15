@@ -1,8 +1,10 @@
 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 // @version=4
 // @author=andre_007
+//
+// Last updated: 15-june-2021
 
-study(title="Encyclopedia of Moving Averages", shorttitle="Moving Averages", format=format.inherit, overlay=true, resolution="")
+study(title="Moving Averages Collection", shorttitle="Moving Averages Collection", format=format.inherit, overlay=true, resolution="")
 
 //-----------------------------------------------------------
 // Type of Moving Averages
