@@ -144,10 +144,10 @@ The ALMA is a relatively new technical indicator, as many of them were developed
 
 Legoux and Kouzis Loukas aimed to provide a leading indicator, as SMAs, EMAs and Smoothed Moving Averages (SMMAs) are considered lagging indicators.
 
+![alt](images/09-ALMA.png)
+
 ### Donations
 
 Bitcoin: 3AK6MxX93czQraP4AFv1wKYDvPnPipgF51
 Dash: XuSnX2YgsGVcfKY24TtndBu5X7tZShPTC7
 LiteCoin: MQEmwEqLA3WUsuQ1E6u8wDxzUrDRotZyH8
-
-![alt](images/09-ALMA.png)
