@@ -149,5 +149,7 @@ Legoux and Kouzis Loukas aimed to provide a leading indicator, as SMAs, EMAs and
 ### Donations
 
 Bitcoin: 3AK6MxX93czQraP4AFv1wKYDvPnPipgF51
+
 Dash: XuSnX2YgsGVcfKY24TtndBu5X7tZShPTC7
+
 LiteCoin: MQEmwEqLA3WUsuQ1E6u8wDxzUrDRotZyH8
