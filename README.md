@@ -1,6 +1,6 @@
 # ![logo](images/Pine.png "Pine")
 
-## Moving Averages Collection
+## Moving Averages Refurbished
 
 ## Summary 💊
 

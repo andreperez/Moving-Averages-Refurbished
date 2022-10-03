@@ -1,0 +1,1453 @@
+//@version=5
+// @author=andre_007
+
+// @version=5
+// @Author andre_007
+// @description Moving Averages Refurbished
+// @License This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// @Thanks and credits:
+//      TradingView
+//      PineCoders
+//      CrackingCryptocurrency
+//      MightyZinger
+//      Alex Orekhov (everget)
+//      alexgrover
+//      paragjyoti2012
+//      Franklin Moormann (cheatcountry)
+
+indicator(title='Moving Averages Refurbished', shorttitle='MAR', format=format.inherit, overlay=true)
+
+import andre_007/MovingAveragesProxy/1 as MaProxy
+
+// ———————————————————————————————————————— Only for benchmark {
+// import PineCoders/LibraryStopwatch/1 as Stopwatch    // Only for debug
+// [timePerBarInMs, totalTimeInMs, barsTimed, barsNotTimed] = Stopwatch.stopwatchStats()
+// msElapsed = Stopwatch.stopwatch()
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Only for Debug {
+// import paragjyoti2012/LoggerLib/5 as Logger
+
+// var logger=Logger.init()
+// var logTable=Logger.initTable(logger, max_rows_count=15, offset=0, position='left', size='small', hide_date=false, stickyRows=0)
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Constants {
+// --> Rolling VWAP
+var string TT_WINDOW = "By default, the time period used to calculate the RVWAP automatically adjusts with the chart's timeframe.
+  Check this to use a fixed-size time period instead, which you define with the following three values."
+var string TT_MINBARS = "The minimum number of last values to keep in the moving window, even if these values are outside the time period.
+  This avoids situations where a large time gap between two bars would cause the time window to be empty."
+var string GRP2 = 'Exclusive for Rolling VWAP'
+// <--
+
+// Moving Averages Types
+var string AARMA    = 'Adaptive Autonomous Recursive Moving Average'
+var string ADEMA    = '* Alpha-Decreasing Exponential Moving Average'
+var string AHMA     = 'Ahrens Moving Average'
+var string ALMA     = 'Arnaud Legoux Moving Average'
+var string ALSMA    = 'Adaptive Least Squares'
+var string AUTOL    = 'Auto-Line'
+var string CMA      = 'Corrective Moving average'
+var string CORMA    = 'Correlation Moving Average Price'
+var string COVWEMA  = 'Coefficient of Variation Weighted Exponential Moving Average'
+var string COVWMA   = 'Coefficient of Variation Weighted Moving Average'
+var string DEMA     = 'Double Exponential Moving Average'
+var string DONCHIAN = 'Donchian Middle Channel'
+var string EDMA     = 'Exponentially Deviating Moving Average'
+var string EDSMA    = 'Ehlers Dynamic Smoothed Moving Average'
+var string EFRAMA   = '* Ehlrs Modified Fractal Adaptive Moving Average'
+var string EHMA     = 'Exponential Hull Moving Average'
+var string EMA      = 'Exponential Moving Average'
+var string EPMA     = 'End Point Moving Average'
+var string ETMA     = 'Exponential Triangular Moving Average'
+var string EVWMA    = 'Elastic Volume Weighted Moving Average'
+var string FAMA     = 'Following Adaptive Moving Average'
+var string FIBOWMA  = 'Fibonacci Weighted Moving Average'
+var string FISHLSMA = 'Fisher Least Squares Moving Average'
+var string FRAMA    = 'Fractal Adaptive Moving Average'
+var string GMA      = 'Geometric Moving Average'
+var string HKAMA    = 'Hilbert based Kaufman\'s Adaptive Moving Average'
+var string HMA      = 'Hull Moving Average'
+var string JURIK    = 'Jurik Moving Average'
+var string KAMA     = 'Kaufman\'s Adaptive Moving Average'
+var string LC_LSMA  = '1LC-LSMA (1 line code lsma with 3 functions)'
+var string LEOMA    = 'Leo Moving Average'
+var string LINWMA   = 'Linear Weighted Moving Average'
+var string LSMA     = 'Least Squares Moving Average'
+var string MAMA     = 'MESA Adaptive Moving Average'
+var string MCMA     = 'McNicholl Moving Average'
+var string MEDIAN   = 'Median'
+var string REGMA    = 'Regularized Exponential Moving Average'
+var string REMA     = 'Range EMA'
+var string REPMA    = 'Repulsion Moving Average'
+var string RMA      = 'Relative Moving Average'
+var string RSIMA    = 'RSI Moving average'
+var string RVWAP    = '* Rolling VWAP'
+var string SMA      = 'Simple Moving Average'
+var string SMMA     = 'Smoothed Moving Average'
+var string SRWMA    = 'Square Root Weighted Moving Average'
+var string SW_MA    = 'Sine-Weighted Moving Average'
+var string SWMA     = '* Symmetrically Weighted Moving Average'
+var string TEMA     = 'Triple Exponential Moving Average'
+var string THMA     = 'Triple Hull Moving Average'
+var string TREMA    = 'Triangular Exponential Moving Average'
+var string TRSMA    = 'Triangular Simple Moving Average'
+var string TT3      = 'Tillson T3'
+var string VAMA     = 'Volatility Adjusted Moving Average'
+var string VIDYA    = 'Variable Index Dynamic Average'
+var string VWAP     = '* VWAP'
+var string VWMA     = 'Volume-weighted Moving Average'
+var string WMA      = 'Weighted Moving Average'
+var string WWMA     = 'Welles Wilder Moving Average'
+var string XEMA     = 'Optimized Exponential Moving Average'
+var string ZEMA     = 'Zero-Lag Exponential Moving Average'
+var string ZSMA     = 'Zero-Lag Simple Moving Average'
+
+// --> Tooltips
+var string TOOLTIP_SAME_PARAMS = 'Check this to apply same type, source and offset for all moving averages.\n' + 
+  'For moving averages with * the length parameter does not apply.\n' +
+  'These types can only be setted individually.'
+var string TOOLTIP_PREDEFINED_PERIODS = '🟩 Defined by user: each period in parameters below take precedence. Otherwise, these periods don\'t take effect.\n' + 
+  '🟩 Arithmetic Progression: set the periods in increments of n, for example, 5, 10, 15,..., where n = 5.\n' + 
+  '🟩 Tradicional: set the periods to some important numbers: 8, 21, 50, 100, 200, 365 (one year), 730 (two years), etc.\n' + 
+  '🟩 Fibonacci: set the periods in increments of Fibonacci: 3, 5, 8, 13, 21,...,233, etc. The limit is 2584.\n' + 
+  '🟩 200 for All: set all the periods with 200. For this parameter to make sense, it is necessary to configure each averaging to a different type.'
+var string TOOLTIP_ALMA = '◆ Offset: this is considered in the formula, not in the graphic! Offset is the Gaussian applied to the combo line and it is 0.85 by default.\nSetting offset at 1 makes it fully aligned to the current price just like the exponential moving average.\nWhile setting it to zero makes it just like a simple moving average.\nTraders may try offset combinations according to their own needs and preferences.\n\n◆ Sigma: the standard deviation applied to the combo line. It makes the combo line sharper.'
+var string TOOLTIP_COLOR_AVERAGE = 'Examples:\n🟩 Moving average 1 > moving average 2 is defined by green.\n🟥 Moving average 1 < moving average 2 is defined by red.'
+
+// --> Predefined periods of Moving Averages
+var string PREDEFINED_PERIODS_1  = 'Defined by user'
+var string PREDEFINED_PERIODS_2  = 'Arithmetic Progression of 5'
+var string PREDEFINED_PERIODS_3  = 'Arithmetic Progression of 7'
+var string PREDEFINED_PERIODS_4  = 'Arithmetic Progression of 8'
+var string PREDEFINED_PERIODS_5  = 'Arithmetic Progression of 9'
+var string PREDEFINED_PERIODS_6  = 'Arithmetic Progression of 10'
+var string PREDEFINED_PERIODS_7  = 'Arithmetic Progression of 16'
+var string PREDEFINED_PERIODS_8  = 'Arithmetic Progression of 20'
+var string PREDEFINED_PERIODS_9  = 'Arithmetic Progression of 30'
+var string PREDEFINED_PERIODS_10 = 'Arithmetic Progression of 32'
+var string PREDEFINED_PERIODS_11 = 'Arithmetic Progression of 50'
+var string PREDEFINED_PERIODS_12 = 'Arithmetic Progression of 64'
+var string PREDEFINED_PERIODS_13 = 'Tradicional: 8, 21, 50, 100, 200, 365, 730, 1095, 1460, 1825, 2190'
+var string PREDEFINED_PERIODS_14 = 'Fibonacci'
+var string PREDEFINED_PERIODS_15 = '200 for All'
+
+// --> Colors (Defined by User) (Default)
+// Bull
+var color COLOR_BULL_01 = #3af13c
+var color COLOR_BULL_02 = #00e85f
+var color COLOR_BULL_03 = #00de7e
+var color COLOR_BULL_04 = #00d39c
+var color COLOR_BULL_05 = #00c7b6
+var color COLOR_BULL_06 = #00bace
+var color COLOR_BULL_07 = #00ace2
+var color COLOR_BULL_08 = #009ef0
+var color COLOR_BULL_09 = #0090f7
+var color COLOR_BULL_10 = #0080f7
+var color COLOR_BULL_11 = #0079fa
+var color COLOR_BULL_12 = #0072fd
+var color COLOR_BULL_13 = #006aff
+var color COLOR_BULL_14 = #0062ff
+var color COLOR_BULL_15 = #0059ff
+var color COLOR_BULL_16 = #004fff
+var color COLOR_BULL_17 = #0044ff
+var color COLOR_BULL_18 = #0038ff
+var color COLOR_BULL_19 = #0028ff
+var color COLOR_BULL_20 = #000cff
+// Bear
+var color COLOR_BEAR_01 = #ff0000
+var color COLOR_BEAR_02 = #fc1c1a
+var color COLOR_BEAR_03 = #f82c2a
+var color COLOR_BEAR_04 = #f43837
+var color COLOR_BEAR_05 = #ef4343
+var color COLOR_BEAR_06 = #f5513b
+var color COLOR_BEAR_07 = #fa5f31
+var color COLOR_BEAR_08 = #fd6d26
+var color COLOR_BEAR_09 = #ff7c18
+var color COLOR_BEAR_10 = #ff8a00
+var color COLOR_BEAR_11 = #ff9900
+var color COLOR_BEAR_12 = #ffa700
+var color COLOR_BEAR_13 = #ffb600
+var color COLOR_BEAR_14 = #ffc400
+var color COLOR_BEAR_15 = #ffd200
+var color COLOR_BEAR_16 = #f6d028
+var color COLOR_BEAR_17 = #eecd3b
+var color COLOR_BEAR_18 = #e6cb4b
+var color COLOR_BEAR_19 = #dec858
+var color COLOR_BEAR_20 = #d7c564
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Global Variables {
+// Default parameters for all moving averages
+var bool inputSameParams = true
+var string inputTypeAll = 'REGMA'
+var float inputSourceAll = close
+var int inputOffsetAll = 0
+
+// Length of Moving Averages
+var int lenMa1  = 5
+var int lenMa2  = 10
+var int lenMa3  = 15
+var int lenMa4  = 20
+var int lenMa5  = 25 
+var int lenMa6  = 30
+var int lenMa7  = 35
+var int lenMa8  = 40
+var int lenMa9  = 45
+var int lenMa10 = 50
+var int lenMa11 = 55
+var int lenMa12 = 60
+var int lenMa13 = 65
+var int lenMa14 = 70
+var int lenMa15 = 75
+var int lenMa16 = 80
+var int lenMa17 = 85
+var int lenMa18 = 90
+var int lenMa19 = 95
+var int lenMa20 = 95
+
+// Calculations of Moving Averages
+float movingAverage1  = na
+float movingAverage2  = na
+float movingAverage3  = na
+float movingAverage4  = na
+float movingAverage5  = na
+float movingAverage6  = na
+float movingAverage7  = na
+float movingAverage8  = na
+float movingAverage9  = na
+float movingAverage10 = na
+float movingAverage11 = na
+float movingAverage12 = na
+float movingAverage13 = na
+float movingAverage14 = na
+float movingAverage15 = na
+float movingAverage16 = na
+float movingAverage17 = na
+float movingAverage18 = na
+float movingAverage19 = na
+float movingAverage20 = na
+
+// Bar Colors
+color barColor = na
+var string inputTheme = 'Defined by user'
+var int inputColorFillTransparency = 90
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Global inputs {
+var string GROUP_ALL = '🔴🔴🔴🔴 Parameters for all Moving Averages'
+inputSameParams := input.bool(title='Same parameters for all moving averages?',
+  defval=true, tooltip=TOOLTIP_SAME_PARAMS, inline='01', group=GROUP_ALL)
+
+inputTypeAll := input.string(title='Type', defval=REGMA,
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='02', group=GROUP_ALL)
+
+inputSourceAll := input.source(title='Source', defval=close, inline='03', group=GROUP_ALL)
+inputOffsetAll := input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='03', group=GROUP_ALL)
+
+var string GRP_AARMA = 'Adaptive Autonomous Recursive Moving Average'
+var float gamma_aarma = input.float(3, "Gamma", group=GRP_AARMA)
+
+var string GRP_ALSMA = 'Adaptive Least Squares Moving Average'
+var float smooth = input.float(1.5, "Smooth", group=GRP_ALSMA)
+
+var string GROUP_ALMA = 'Arnaud Legoux Moving Average (ALMA)'
+inputAlmaOffset = input.float(title='Offset', defval=0.85, group=GROUP_ALMA, inline='04') 
+inputAlmaSigma  = input.float(title='Sigma', defval=6, group=GROUP_ALMA, inline='04', tooltip=TOOLTIP_ALMA)
+
+var string GRP_CORR = 'Correlation Moving Average'
+var string GRP_CORR_TOOLTIP = 'Number multiplied after calculating correlation + standard deviation.'
+var float factor = input.float(1.7, "Factor", group=GRP_CORR, tooltip=GRP_CORR_TOOLTIP) 
+
+var string GRP_EHLR = 'Ehlrs Modified Fractal Adaptive Moving Average'
+var int fc = input.int(8, 'Lower Shift Limit', group=GRP_EHLR)
+var int sc = input.int(8, 'Upper Shift Limit', group=GRP_EHLR)
+
+var string GRP_EPMA = 'End Point Moving Average'
+offset_epma = input.int(title="Offset", defval=4, group=GRP_EPMA)
+
+var string GRP_JURIK = 'Jurik Moving Average'
+var int jurik_phase = input.int(3, "Phase", group=GRP_JURIK)
+var int jurik_power = input.int(1, "Power", group=GRP_JURIK)
+
+var string GRP_LWMA = 'Linear Weighted Moving Average'
+lwma_weight = input.int(6, title = "Weight", minval=1, step=1, group=GRP_LWMA)
+
+var string GRP_REGMA = 'Regularized Exponential Moving Average'
+var string GRP_REGMA_TOOLTIP = 'A factor that controls the \"regularization\" amount. When the Lambda value is set to zero, the Regularized Exponential Moving Average becomes the standard EMA.'
+var float lambda = input.float(0.5, "Lambda", group=GRP_REGMA, tooltip=GRP_REGMA_TOOLTIP) 
+
+var string GRP_RVWAP = 'Rolling VWAP'
+bool _fixedTfInput = input.bool(false, "Use a fixed time period", group = GRP_RVWAP, tooltip = TT_WINDOW, inline='1')
+int  _daysInput    = input.int(1, "Days", minval = 0, maxval = 90, group = GRP_RVWAP, inline='2') 
+int  _hoursInput   = input.int(0, "Hours", minval = 0, maxval = 23, group = GRP_RVWAP, inline='2') 
+int  _minsInput    = input.int(0, "Minutes", minval = 0, maxval = 59, group = GRP_RVWAP, inline='2')
+int  _minBarsInput = input.int(10, "Bars", group = GRP_RVWAP, tooltip = TT_MINBARS, inline='3')
+
+var string GRP_T3 = 'Tillson T3'
+var float a1_t3 = input.float(0.7, 'Volume factor', group=GRP_T3)
+
+var string GRP_VADMA = 'Volatility Adjusted Moving Average'
+var string GRP_VADMA_TOOLTIP = 'Volatility loopback'
+var int volatility_lookback = input.int(10, 'Loopback', minval=1, step=1, group=GRP_VADMA, tooltip=GRP_VADMA_TOOLTIP)
+
+var string GRP_VWMA = 'Volume Weighted Moving Average'
+var string GRP_VWMA_TOOLTIP = 'The most common "Volume Weighted Moving Average" is a Simple Moving Average of Price x Volume, divided by Simple Moving Average of Volume. \n' + 
+  'Enabling this checkbox, it\'s possible to have other types and less common moving averages weighted by volume, for example, Exponencial Volume Weighted Moving Average, Alma Volume Weighted Moving Average, etc...'
+applyVolumeWeighted = input.bool(title="Volume Weighted Moving Average?", defval=false, group=GRP_VWMA, tooltip=GRP_VWMA_TOOLTIP)
+
+var string GROUP_AVERAGE_COLORS = 'Colors and theme'
+
+inputTheme := input.string(defval='Classic', title='Theme', 
+  options = ['Defined by user', 'Classic', 'Deep Purple', 'Sweden', 'Ocean', 'Monokai'], 
+  tooltip='Theme for color lines', inline='05', group=GROUP_AVERAGE_COLORS)
+
+var string color_A = 'moving average is below or above the next moving average'
+var string color_B = 'price is below or above the next moving average'
+var inputApplyAverageColors = input.bool(title="Change line colors?", 
+  defval=true, inline='06', group=GROUP_AVERAGE_COLORS, tooltip=TOOLTIP_COLOR_AVERAGE)
+var string avgColorLogic = input.string(defval=color_A, title='When', inline='06', group=GROUP_AVERAGE_COLORS, options=[color_A, color_B]) 
+var bool inputFill = input.bool(title='Fill background between averages?', defval=false, inline='07', group=GROUP_AVERAGE_COLORS)
+inputColorFillTransparency := input.int(defval=90 , title="Transparency for fill", minval=0, maxval=100, inline = "08", group=GROUP_AVERAGE_COLORS) 
+
+var string GROUP_BAR_COLORS = 'Bar Colors'
+
+var inputApplyBarColorsLinesAligned = input.bool(title="Apply Bar Colors when price are above or bellow all MAs?", defval=false, inline='10', group=GROUP_BAR_COLORS)
+var inputBarColorBullLinesAligned   = input.color(#3af13c, 'Bullish', inline='11', group=GROUP_BAR_COLORS)
+var inputBarColorBearLinesAligned   = input.color(#bd0000, 'Bearish', inline='11', group=GROUP_BAR_COLORS)
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Functions {
+// @function applyType
+// @description Utilitarian function that returns the global type of moving averges or individual types
+// @param type Type of Moving Average
+// @returns Type of Moving Average
+applyType(type) =>
+    typeOut = inputSameParams ? inputTypeAll : type
+    typeOut
+
+// @function applySource
+// @description Utilitarian function that returns the global source of moving averges or individual sources
+// @param src Source of series (close, high, low, etc.)
+// @returns Source of Moving Average
+applySource(src) =>
+    srcOut = inputSameParams ? inputSourceAll : src
+    srcOut
+
+// @function applyOffset
+// @description Utilitarian function that returns the global offset of moving averges or individual offsets
+// @param offset Offset of Moving Average
+// @returns Offset of Moving Average
+applyOffset(offset) =>
+    offsetOut = inputSameParams ? inputOffsetAll : offset
+    offsetOut
+
+// @function applyColorMovingAverage
+// @description Returns a bull color if first average is greater than second average, otherwise returns a bear color.
+// @param ma1 First moving average
+// @param ma2 Second moving average
+// @param colorBull Color used when first average is greater than second average
+// @param colorBear Color used when first average is less than second average
+// @param src Price source
+// @returns Color
+applyColorMovingAverage(series float ma1, series float ma2, color colorBull, color colorBear, series float src) =>
+    color colorMA = switch inputApplyAverageColors
+        true => 
+            if (avgColorLogic == color_A ? ma1 : src)  >= ma2
+                colorBull
+            else
+                colorBear
+        false =>
+           colorBull
+
+// @function applyBarColor
+// @description Returns a bull color if price source is greater than all moving averages
+//   Otherwise returns a bear color.
+// @param src Source of series (close, high, low, etc.)
+// @returns Color
+applyBarColor(float src) =>
+    color _barColor = na
+    
+    _barColor := if inputApplyBarColorsLinesAligned
+        if src >= nz(movingAverage1) and 
+          src >= nz(movingAverage2) and
+          src >= nz(movingAverage3) and
+          src >= nz(movingAverage4) and
+          src >= nz(movingAverage5) and
+          src >= nz(movingAverage6) and
+          src >= nz(movingAverage7) and
+          src >= nz(movingAverage8) and
+          src >= nz(movingAverage9) and
+          src >= nz(movingAverage10) and
+          src >= nz(movingAverage11) and
+          src >= nz(movingAverage12) and
+          src >= nz(movingAverage13) and
+          src >= nz(movingAverage14) and
+          src >= nz(movingAverage15) and
+          src >= nz(movingAverage16) and
+          src >= nz(movingAverage17) and
+          src >= nz(movingAverage18) and
+          src >= nz(movingAverage19) and
+          src >= nz(movingAverage20)
+            inputBarColorBullLinesAligned
+        else if src <= nz(movingAverage1, src) and 
+          src <= nz(movingAverage2, src) and
+          src <= nz(movingAverage3, src) and
+          src <= nz(movingAverage4, src) and
+          src <= nz(movingAverage5, src) and
+          src <= nz(movingAverage6, src) and
+          src <= nz(movingAverage7, src) and
+          src <= nz(movingAverage8, src) and
+          src <= nz(movingAverage9, src) and
+          src <= nz(movingAverage10, src) and
+          src <= nz(movingAverage11, src) and
+          src <= nz(movingAverage12, src) and
+          src <= nz(movingAverage13, src) and
+          src <= nz(movingAverage14, src) and
+          src <= nz(movingAverage15, src) and
+          src <= nz(movingAverage16, src) and
+          src <= nz(movingAverage17, src) and
+          src <= nz(movingAverage18, src) and
+          src <= nz(movingAverage19, src) and
+          src <= nz(movingAverage20, src)          
+            inputBarColorBearLinesAligned
+    
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Inputs {
+
+string GROUP_AVG = '🔴🔴🔴🔴🔴 Moving Averages'
+
+var string inputPredefinedPeriods = input.string(PREDEFINED_PERIODS_1, 
+  'Predefined Periods', 
+  options=[
+      PREDEFINED_PERIODS_1, 
+      PREDEFINED_PERIODS_2, 
+      PREDEFINED_PERIODS_3, 
+      PREDEFINED_PERIODS_4, 
+      PREDEFINED_PERIODS_5, 
+      PREDEFINED_PERIODS_6, 
+      PREDEFINED_PERIODS_7, 
+      PREDEFINED_PERIODS_8,
+      PREDEFINED_PERIODS_9, 
+      PREDEFINED_PERIODS_10,
+      PREDEFINED_PERIODS_11,
+      PREDEFINED_PERIODS_12,
+      PREDEFINED_PERIODS_13,
+      PREDEFINED_PERIODS_14,
+      PREDEFINED_PERIODS_15], 
+      inline='09', group=GROUP_AVG, tooltip=TOOLTIP_PREDEFINED_PERIODS)
+
+// ————— Average 1
+bool inputShowAvg1 = input.bool(title='Moving Average 1', defval=true, inline='12', group=GROUP_AVG)
+color inputColorBull1 = input.color(COLOR_BULL_01, '', inline='12', group=GROUP_AVG)
+color inputColorBear1 = input.color(COLOR_BEAR_01, '', inline='12', group=GROUP_AVG)
+
+string inputTypeMa1 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='13', group=GROUP_AVG)
+int inputLengthMa1 = input.int(5, minval=1, title='Length', inline='13', group=GROUP_AVG)
+float inputSourceMa1 = input.source(close, title='Source', inline='14', group=GROUP_AVG)
+int inputOffsetMa1 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='14', group=GROUP_AVG)
+
+// ————— Average 2
+bool inputShowAvg2 = input.bool(title='Moving Average 2', defval=true, inline='15', group=GROUP_AVG)
+color inputColorBull2 = input.color(COLOR_BULL_02, '', inline='15', group=GROUP_AVG)
+color inputColorBear2 = input.color(COLOR_BEAR_02, '', inline='15', group=GROUP_AVG)
+
+string inputTypeMa2 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='16', group=GROUP_AVG)
+int inputLengthMa2 = input.int(10, minval=1, title='Length', inline='16', group=GROUP_AVG)
+float inputSourceMa2 = input.source(close, title='Source', inline='17', group=GROUP_AVG)
+int inputOffsetMa2 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='17', group=GROUP_AVG)
+
+// ————— Average 3
+bool inputShowAvg3 = input.bool(title='Moving Average 3', defval=true, inline='18', group=GROUP_AVG)
+color inputColorBull3 = input.color(COLOR_BULL_03, '', inline='18', group=GROUP_AVG)
+color inputColorBear3 = input.color(COLOR_BEAR_03, '', inline='18', group=GROUP_AVG)
+
+string inputTypeMa3 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='19', group=GROUP_AVG)
+int inputLengthMa3 = input.int(15, minval=1, title='Length', inline='19', group=GROUP_AVG)
+float inputSourceMa3 = input.source(close, title='Source', inline='20', group=GROUP_AVG)
+int inputOffsetMa3 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='20', group=GROUP_AVG)
+
+// ————— Average 4
+bool inputShowAvg4 = input.bool(title='Moving Average 4', defval=true, inline='21', group=GROUP_AVG)
+color inputColorBull4 = input.color(COLOR_BULL_04, '', inline='21', group=GROUP_AVG)
+color inputColorBear4 = input.color(COLOR_BEAR_04, '', inline='21', group=GROUP_AVG)
+
+string inputTypeMa4 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='22', group=GROUP_AVG)
+int inputLengthMa4 = input.int(20, minval=1, title='Length', inline='22', group=GROUP_AVG)
+float inputSourceMa4 = input.source(close, title='Source', inline='23', group=GROUP_AVG)
+int inputOffsetMa4 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='23', group=GROUP_AVG)
+
+// ————— Average 5
+bool inputShowAvg5 = input.bool(title='Moving Average 5', defval=true, inline='24', group=GROUP_AVG)
+color inputColorBull5 = input.color(COLOR_BULL_05, '', inline='24', group=GROUP_AVG)
+color inputColorBear5 = input.color(COLOR_BEAR_05, '', inline='24', group=GROUP_AVG)
+
+string inputTypeMa5 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='25', group=GROUP_AVG)
+int inputLengthMa5 = input.int(25, minval=1, title='Length', inline='25', group=GROUP_AVG)
+float inputSourceMa5 = input.source(close, title='Source', inline='26', group=GROUP_AVG)
+int inputOffsetMa5 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='26', group=GROUP_AVG)
+
+// ————— Average 6
+bool inputShowAvg6 = input.bool(title='Moving Average 6', defval=true, inline='27', group=GROUP_AVG)
+color inputColorBull6 = input.color(COLOR_BULL_06, '', inline='27', group=GROUP_AVG)
+color inputColorBear6 = input.color(COLOR_BEAR_06, '', inline='27', group=GROUP_AVG)
+
+string inputTypeMa6 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='28', group=GROUP_AVG)
+int inputLengthMa6 = input.int(30, minval=1, title='Length', inline='28', group=GROUP_AVG)
+float inputSourceMa6 = input.source(close, title='Source', inline='29', group=GROUP_AVG)
+int inputOffsetMa6 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='29', group=GROUP_AVG)
+
+// ————— Average 7
+bool inputShowAvg7 = input.bool(title='Moving Average 7', defval=true, inline='30', group=GROUP_AVG)
+color inputColorBull7 = input.color(COLOR_BULL_07, '', inline='30', group=GROUP_AVG)
+color inputColorBear7 = input.color(COLOR_BEAR_07, '', inline='30', group=GROUP_AVG)
+
+string inputTypeMa7 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='31', group=GROUP_AVG)
+int inputLengthMa7 = input.int(35, minval=1, title='Length', inline='31', group=GROUP_AVG)
+float inputSourceMa7 = input.source(close, title='Source', inline='32', group=GROUP_AVG)
+int inputOffsetMa7 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='32', group=GROUP_AVG)
+
+// ————— Average 8
+bool inputShowAvg8 = input.bool(title='Moving Average 8', defval=true, inline='33', group=GROUP_AVG)
+color inputColorBull8 = input.color(COLOR_BULL_08, '', inline='33', group=GROUP_AVG)
+color inputColorBear8 = input.color(COLOR_BEAR_08, '', inline='33', group=GROUP_AVG)
+
+string inputTypeMa8 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='34', group=GROUP_AVG)
+int inputLengthMa8 = input.int(40, minval=1, title='Length', inline='34', group=GROUP_AVG)
+float inputSourceMa8 = input.source(close, title='Source', inline='35', group=GROUP_AVG)
+int inputOffsetMa8 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='35', group=GROUP_AVG)
+
+// ————— Average 9
+bool inputShowAvg9 = input.bool(title='Moving Average 9', defval=true, inline='36', group=GROUP_AVG)
+color inputColorBull9 = input.color(COLOR_BULL_09, '', inline='36', group=GROUP_AVG)
+color inputColorBear9 = input.color(COLOR_BEAR_09, '', inline='36', group=GROUP_AVG)
+
+string inputTypeMa9 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='37', group=GROUP_AVG)
+int inputLengthMa9 = input.int(45, minval=1, title='Length', inline='37', group=GROUP_AVG)
+float inputSourceMa9 = input.source(close, title='Source', inline='38', group=GROUP_AVG)
+int inputOffsetMa9 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='38', group=GROUP_AVG)
+
+// ————— Average 10
+bool inputShowAvg10 = input.bool(title='Moving Average 10', defval=true, inline='39', group=GROUP_AVG)
+color inputColorBull10 = input.color(COLOR_BULL_10, '', inline='39', group=GROUP_AVG)
+color inputColorBear10 = input.color(COLOR_BEAR_10, '', inline='39', group=GROUP_AVG)
+
+string inputTypeMa10 = input.string(SMA, 'Type',
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='40', group=GROUP_AVG)
+int inputLengthMa10 = input.int(50, minval=1, title='Length', inline='40', group=GROUP_AVG)
+float inputSourceMa10 = input.source(close, title='Source', inline='41', group=GROUP_AVG)
+int inputOffsetMa10 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='41', group=GROUP_AVG)
+
+// ————— Average 11
+bool inputShowAvg11 = input.bool(title='Moving Average 11', defval=true, inline='42', group=GROUP_AVG)
+color inputColorBull11 = input.color(COLOR_BULL_11, '', inline='42', group=GROUP_AVG)
+color inputColorBear11 = input.color(COLOR_BEAR_11, '', inline='42', group=GROUP_AVG)
+
+string inputTypeMa11 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='43', group=GROUP_AVG)
+int inputLengthMa11 = input.int(55, minval=1, title='Length', inline='43', group=GROUP_AVG)
+float inputSourceMa11 = input.source(close, title='Source', inline='44', group=GROUP_AVG)
+int inputOffsetMa11 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='44', group=GROUP_AVG)
+
+// ————— Average 12
+bool inputShowAvg12 = input.bool(title='Moving Average 12', defval=true, inline='45', group=GROUP_AVG)
+color inputColorBull12 = input.color(COLOR_BULL_12, '', inline='45', group=GROUP_AVG)
+color inputColorBear12 = input.color(COLOR_BEAR_12, '', inline='45', group=GROUP_AVG)
+
+string inputTypeMa12 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='46', group=GROUP_AVG)
+int inputLengthMa12 = input.int(60, minval=1, title='Length', inline='46', group=GROUP_AVG)
+float inputSourceMa12 = input.source(close, title='Source', inline='47', group=GROUP_AVG)
+int inputOffsetMa12 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='47', group=GROUP_AVG)
+
+// ————— Average 13
+bool inputShowAvg13 = input.bool(title='Moving Average 13', defval=true, inline='48', group=GROUP_AVG)
+color inputColorBull13 = input.color(COLOR_BULL_13, '', inline='48', group=GROUP_AVG)
+color inputColorBear13 = input.color(COLOR_BEAR_13, '', inline='48', group=GROUP_AVG)
+
+string inputTypeMa13 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='49', group=GROUP_AVG)
+int inputLengthMa13 = input.int(65, minval=1, title='Length', inline='49', group=GROUP_AVG)
+float inputSourceMa13 = input.source(close, title='Source', inline='50', group=GROUP_AVG)
+int inputOffsetMa13 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='50', group=GROUP_AVG)
+
+// ————— Average 14
+bool inputShowAvg14 = input.bool(title='Moving Average 14', defval=true, inline='51', group=GROUP_AVG)
+color inputColorBull14 = input.color(COLOR_BULL_14, '', inline='51', group=GROUP_AVG)
+color inputColorBear14 = input.color(COLOR_BEAR_14, '', inline='51', group=GROUP_AVG)
+
+string inputTypeMa14 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='52', group=GROUP_AVG)
+int inputLengthMa14 = input.int(70, minval=1, title='Length', inline='52', group=GROUP_AVG)
+float inputSourceMa14 = input.source(close, title='Source', inline='53', group=GROUP_AVG)
+int inputOffsetMa14 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='53', group=GROUP_AVG)
+
+// ————— Average 15
+bool inputShowAvg15 = input.bool(title='Moving Average 15', defval=true, inline='54', group=GROUP_AVG)
+color inputColorBull15 = input.color(COLOR_BULL_15, '', inline='54', group=GROUP_AVG)
+color inputColorBear15 = input.color(COLOR_BEAR_15, '', inline='54', group=GROUP_AVG)
+
+string inputTypeMa15 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='55', group=GROUP_AVG)
+int inputLengthMa15 = input.int(75, minval=1, title='Length', inline='55', group=GROUP_AVG)
+float inputSourceMa15 = input.source(close, title='Source', inline='56', group=GROUP_AVG)
+int inputOffsetMa15 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='56', group=GROUP_AVG)
+
+// ————— Average 16
+bool inputShowAvg16 = input.bool(title='Moving Average 16', defval=true, inline='57', group=GROUP_AVG)
+color inputColorBull16 = input.color(COLOR_BULL_16, '', inline='57', group=GROUP_AVG)
+color inputColorBear16 = input.color(COLOR_BEAR_16, '', inline='57', group=GROUP_AVG)
+
+string inputTypeMa16 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='58', group=GROUP_AVG)
+int inputLengthMa16 = input.int(80, minval=1, title='Length', inline='58', group=GROUP_AVG)
+float inputSourceMa16 = input.source(close, title='Source', inline='59', group=GROUP_AVG)
+int inputOffsetMa16 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='59', group=GROUP_AVG)
+
+// ————— Average 17
+bool inputShowAvg17 = input.bool(title='Moving Average 17', defval=true, inline='60', group=GROUP_AVG)
+color inputColorBull17 = input.color(COLOR_BULL_17, '', inline='60', group=GROUP_AVG)
+color inputColorBear17 = input.color(COLOR_BEAR_17, '', inline='60', group=GROUP_AVG)
+
+string inputTypeMa17 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='61', group=GROUP_AVG)
+int inputLengthMa17 = input.int(85, minval=1, title='Length', inline='61', group=GROUP_AVG)
+float inputSourceMa17 = input.source(close, title='Source', inline='62', group=GROUP_AVG)
+int inputOffsetMa17 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='62', group=GROUP_AVG)
+
+// ————— Average 18
+bool inputShowAvg18 = input.bool(title='Moving Average 18', defval=true, inline='63', group=GROUP_AVG)
+color inputColorBull18 = input.color(COLOR_BULL_18, '', inline='63', group=GROUP_AVG)
+color inputColorBear18 = input.color(COLOR_BEAR_18, '', inline='63', group=GROUP_AVG)
+
+string inputTypeMa18 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='64', group=GROUP_AVG)
+int inputLengthMa18 = input.int(90, minval=1, title='Length', inline='64', group=GROUP_AVG)
+float inputSourceMa18 = input.source(close, title='Source', inline='65', group=GROUP_AVG)
+int inputOffsetMa18 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='65', group=GROUP_AVG)
+
+// ————— Average 19
+bool inputShowAvg19 = input.bool(title='Moving Average 19', defval=true, inline='66', group=GROUP_AVG)
+color inputColorBull19 = input.color(COLOR_BULL_19, '', inline='66', group=GROUP_AVG)
+color inputColorBear19 = input.color(COLOR_BEAR_19, '', inline='66', group=GROUP_AVG)
+
+string inputTypeMa19 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='67', group=GROUP_AVG)
+int inputLengthMa19 = input.int(95, minval=1, title='Length', inline='67', group=GROUP_AVG)
+float inputSourceMa19 = input.source(close, title='Source', inline='68', group=GROUP_AVG)
+int inputOffsetMa19 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='68', group=GROUP_AVG)
+
+// ————— Average 20
+bool inputShowAvg20 = input.bool(title='Moving Average 20', defval=true, inline='69', group=GROUP_AVG)
+color inputColorBull20 = input.color(COLOR_BULL_20, '', inline='69', group=GROUP_AVG)
+color inputColorBear20 = input.color(COLOR_BEAR_20, '', inline='69', group=GROUP_AVG)
+
+string inputTypeMa20 = input.string(SMA, 'Type', 
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
+  inline='70', group=GROUP_AVG)
+int inputLengthMa20 = input.int(100, minval=1, title='Length', inline='70', group=GROUP_AVG)
+float inputSourceMa20 = input.source(close, title='Source', inline='71', group=GROUP_AVG)
+int inputOffsetMa20 = input.int(title='Offset', defval=0, minval=-500, maxval=500, inline='71', group=GROUP_AVG)
+
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Calculations {
+
+// @function calculateMovingAverage
+// @description Abstract function that invokes the calculation of average according to type
+// @param type Type of Moving Average
+// @param src Source of series (close, high, low, etc.)
+// @param len Period of loopback to calculate the average
+// @returns series of moving average
+calculateMovingAverage(simple string type, float src, simple int len) =>
+    
+    // ———————————————————— Only for Debug {
+    // Logger.log("Type: " + type, logger, logTable, "info")
+    // ———————————————————— }
+    
+    MaProxy.getMovingAverage(
+      type=type, src=src, len=len,
+      lsmaOffset=0,
+      inputAlmaOffset=inputAlmaOffset, inputAlmaSigma=inputAlmaSigma, 
+      FC=fc, SC=sc, 
+      a1_t3=a1_t3,
+      fixedTfInput=_fixedTfInput, daysInput=_daysInput, hoursInput=_hoursInput, minsInput=_minsInput, minBarsInput=_minBarsInput,
+      lambda=lambda,
+      factor=factor,
+      offset_epma=offset_epma,
+      volumeWeighted=applyVolumeWeighted,
+      gamma_aarma=gamma_aarma,
+      smooth=smooth,
+      linweight=lwma_weight,
+      volatility_lookback=volatility_lookback,
+      jurik_phase=jurik_phase,
+      jurik_power=jurik_power)
+
+switch inputPredefinedPeriods        
+    'Defined by user' => 
+        lenMa1  := inputLengthMa1
+        lenMa2  := inputLengthMa2
+        lenMa3  := inputLengthMa3
+        lenMa4  := inputLengthMa4
+        lenMa5  := inputLengthMa5
+        lenMa6  := inputLengthMa6
+        lenMa7  := inputLengthMa7
+        lenMa8  := inputLengthMa8
+        lenMa9  := inputLengthMa9
+        lenMa10 := inputLengthMa10
+        lenMa11 := inputLengthMa11
+        lenMa12 := inputLengthMa12
+        lenMa13 := inputLengthMa13
+        lenMa14 := inputLengthMa14
+        lenMa15 := inputLengthMa15
+        lenMa16 := inputLengthMa16
+        lenMa17 := inputLengthMa17
+        lenMa18 := inputLengthMa18
+        lenMa19 := inputLengthMa19
+        lenMa20 := inputLengthMa20
+    'Arithmetic Progression of 5' =>
+        lenMa1  := 5
+        lenMa2  := 10
+        lenMa3  := 15
+        lenMa4  := 20
+        lenMa5  := 25
+        lenMa6  := 30
+        lenMa7  := 35
+        lenMa8  := 40
+        lenMa9  := 45
+        lenMa10 := 50
+        lenMa11 := 55
+        lenMa12 := 60
+        lenMa13 := 65
+        lenMa14 := 70
+        lenMa15 := 75
+        lenMa16 := 80
+        lenMa17 := 85
+        lenMa18 := 90
+        lenMa19 := 95
+        lenMa20 := 100
+    'Arithmetic Progression of 7' =>
+        lenMa1  := 7
+        lenMa2  := 14
+        lenMa3  := 21
+        lenMa4  := 28
+        lenMa5  := 35
+        lenMa6  := 42
+        lenMa7  := 49
+        lenMa8  := 56
+        lenMa9  := 63
+        lenMa10 := 70
+        lenMa11 := 77
+        lenMa12 := 84
+        lenMa13 := 91
+        lenMa14 := 98
+        lenMa15 := 105
+        lenMa16 := 112
+        lenMa17 := 119
+        lenMa18 := 126
+        lenMa19 := 133
+        lenMa20 := 140
+    'Arithmetic Progression of 8' =>
+        lenMa1  := 8
+        lenMa2  := 16
+        lenMa3  := 24
+        lenMa4  := 32
+        lenMa5  := 40
+        lenMa6  := 48
+        lenMa7  := 56
+        lenMa8  := 64
+        lenMa9  := 72
+        lenMa10 := 80
+        lenMa11 := 88
+        lenMa12 := 96
+        lenMa13 := 104
+        lenMa14 := 112
+        lenMa15 := 120
+        lenMa16 := 128
+        lenMa17 := 136        
+        lenMa18 := 144
+        lenMa19 := 152
+        lenMa20 := 160
+    'Arithmetic Progression of 9' =>
+        lenMa1  := 9
+        lenMa2  := 18
+        lenMa3  := 27
+        lenMa4  := 36
+        lenMa5  := 45
+        lenMa6  := 54
+        lenMa7  := 63
+        lenMa8  := 72
+        lenMa9  := 81
+        lenMa10 := 90
+        lenMa11 := 99
+        lenMa12 := 108
+        lenMa13 := 117
+        lenMa14 := 126
+        lenMa15 := 135
+        lenMa16 := 144
+        lenMa17 := 153     
+        lenMa18 := 162
+        lenMa19 := 171
+        lenMa20 := 180             
+    'Arithmetic Progression of 10' =>
+        lenMa1  := 10
+        lenMa2  := 20    
+        lenMa3  := 30
+        lenMa4  := 40
+        lenMa5  := 50
+        lenMa6  := 60
+        lenMa7  := 70
+        lenMa8  := 80
+        lenMa9  := 90
+        lenMa10 := 100
+        lenMa11 := 110
+        lenMa12 := 120
+        lenMa13 := 130
+        lenMa14 := 140
+        lenMa15 := 150
+        lenMa16 := 160
+        lenMa17 := 170
+        lenMa18 := 180
+        lenMa19 := 190
+        lenMa20 := 200
+    'Arithmetic Progression of 16' =>
+        lenMa1  := 16
+        lenMa2  := 32    
+        lenMa3  := 48
+        lenMa4  := 64
+        lenMa5  := 80
+        lenMa6  := 96
+        lenMa7  := 112
+        lenMa8  := 128
+        lenMa9  := 144
+        lenMa10 := 160
+        lenMa11 := 176
+        lenMa12 := 192
+        lenMa13 := 208
+        lenMa14 := 224
+        lenMa15 := 240
+        lenMa16 := 256
+        lenMa17 := 272      
+        lenMa18 := 288
+        lenMa19 := 304
+        lenMa20 := 320
+    'Arithmetic Progression of 20' =>
+        lenMa1  := 20
+        lenMa2  := 40        
+        lenMa3  := 60
+        lenMa4  := 80
+        lenMa5  := 100
+        lenMa6  := 120
+        lenMa7  := 140
+        lenMa8  := 160
+        lenMa9  := 180
+        lenMa10 := 200
+        lenMa11 := 220
+        lenMa12 := 240
+        lenMa13 := 260
+        lenMa14 := 280
+        lenMa15 := 300
+        lenMa16 := 320
+        lenMa17 := 340
+        lenMa18 := 360
+        lenMa19 := 380
+        lenMa20 := 400
+    'Arithmetic Progression of 30' =>
+        lenMa1  := 30
+        lenMa2  := 60    
+        lenMa3  := 90
+        lenMa4  := 120
+        lenMa5  := 150
+        lenMa6  := 180
+        lenMa7  := 210
+        lenMa8  := 240
+        lenMa9  := 270
+        lenMa10 := 300
+        lenMa11 := 330
+        lenMa12 := 360
+        lenMa13 := 390
+        lenMa14 := 420
+        lenMa15 := 450
+        lenMa16 := 480
+        lenMa17 := 510        
+        lenMa18 := 540
+        lenMa19 := 570
+        lenMa20 := 600        
+    'Arithmetic Progression of 32' =>
+        lenMa1  := 32
+        lenMa2  := 64    
+        lenMa3  := 96
+        lenMa4  := 128
+        lenMa5  := 160
+        lenMa6  := 192
+        lenMa7  := 224
+        lenMa8  := 256
+        lenMa9  := 288
+        lenMa10 := 320
+        lenMa11 := 352
+        lenMa12 := 384
+        lenMa13 := 416
+        lenMa14 := 448
+        lenMa15 := 480
+        lenMa16 := 512
+        lenMa17 := 544      
+        lenMa18 := 576
+        lenMa19 := 608
+        lenMa20 := 640
+    'Arithmetic Progression of 50' =>
+        lenMa1  := 50
+        lenMa2  := 100  
+        lenMa3  := 150
+        lenMa4  := 200
+        lenMa5  := 250
+        lenMa6  := 300
+        lenMa7  := 350
+        lenMa8  := 400
+        lenMa9  := 450
+        lenMa10 := 500
+        lenMa11 := 550
+        lenMa12 := 600
+        lenMa13 := 650
+        lenMa14 := 700
+        lenMa15 := 750
+        lenMa16 := 800
+        lenMa17 := 850
+        lenMa18 := 900
+        lenMa19 := 950
+        lenMa20 := 1000
+    'Arithmetic Progression of 64' =>
+        lenMa1  := 64
+        lenMa2  := 128
+        lenMa3  := 192
+        lenMa4  := 256
+        lenMa5  := 320
+        lenMa6  := 384
+        lenMa7  := 448
+        lenMa8  := 512
+        lenMa9  := 576
+        lenMa10 := 640
+        lenMa11 := 704
+        lenMa12 := 768
+        lenMa13 := 832
+        lenMa14 := 896
+        lenMa15 := 960
+        lenMa16 := 1024
+        lenMa17 := 1088
+        lenMa18 := 1152
+        lenMa19 := 1216
+        lenMa20 := 1280                     
+    'Tradicional: 8, 21, 50, 100, 200, 365, 730, 1095, 1460, 1825, 2190' =>
+        lenMa1  := 8
+        lenMa2  := 21
+        lenMa3  := 50
+        lenMa4  := 100
+        lenMa5  := 200
+        lenMa6  := 365
+        lenMa7  := 730
+        lenMa8  := 1095
+        lenMa9  := 1460
+        lenMa10 := 1825
+        lenMa11 := 2190
+        lenMa12 := 1
+        lenMa13 := 1
+        lenMa14 := 1
+        lenMa15 := 1
+        lenMa16 := 1
+        lenMa17 := 1
+        lenMa18 := 1
+        lenMa19 := 1
+        lenMa20 := 1
+        inputShowAvg12 := false
+        inputShowAvg13 := false
+        inputShowAvg14 := false
+        inputShowAvg15 := false
+        inputShowAvg16 := false
+        inputShowAvg17 := false
+        inputShowAvg18 := false        
+        inputShowAvg19 := false        
+        inputShowAvg20 := false                
+    'Fibonacci' =>
+        lenMa1  := 3
+        lenMa2  := 5
+        lenMa3  := 8
+        lenMa4  := 13
+        lenMa5  := 21
+        lenMa6  := 34
+        lenMa7  := 55
+        lenMa8  := 89
+        lenMa9  := 144
+        lenMa10 := 233
+        lenMa11 := 377
+        lenMa12 := 610
+        lenMa13 := 987
+        lenMa14 := 1597
+        lenMa15 := 2584
+        lenMa16 := 4181
+        lenMa17 := 1     // 6765 or more don't work
+        lenMa18 := 1
+        lenMa19 := 1
+        lenMa20 := 1
+        inputShowAvg17 := false
+        inputShowAvg18 := false        
+        inputShowAvg19 := false        
+        inputShowAvg20 := false        
+    '200 for All' =>
+        lenMa1  := 200
+        lenMa2  := 200    
+        lenMa3  := 200
+        lenMa4  := 200
+        lenMa5  := 200
+        lenMa6  := 200
+        lenMa7  := 200
+        lenMa8  := 200
+        lenMa9  := 200
+        lenMa10 := 200
+        lenMa11 := 200
+        lenMa12 := 200
+        lenMa13 := 200
+        lenMa14 := 200
+        lenMa15 := 200
+        lenMa16 := 200
+        lenMa17 := 200      
+        lenMa18 := 200            
+        lenMa19 := 200            
+        lenMa20 := 200            
+
+if inputShowAvg1
+    movingAverage1 := calculateMovingAverage(applyType(inputTypeMa1), applySource(inputSourceMa1), lenMa1)
+if inputShowAvg2
+    movingAverage2 := calculateMovingAverage(applyType(inputTypeMa2), applySource(inputSourceMa2), lenMa2)
+if inputShowAvg3
+    movingAverage3 := calculateMovingAverage(applyType(inputTypeMa3), applySource(inputSourceMa3), lenMa3)
+if inputShowAvg4
+    movingAverage4 := calculateMovingAverage(applyType(inputTypeMa4), applySource(inputSourceMa4), lenMa4)
+if inputShowAvg5
+    movingAverage5 := calculateMovingAverage(applyType(inputTypeMa5), applySource(inputSourceMa5), lenMa5)
+if inputShowAvg6
+    movingAverage6 := calculateMovingAverage(applyType(inputTypeMa6), applySource(inputSourceMa6), lenMa6)
+if inputShowAvg7
+    movingAverage7 := calculateMovingAverage(applyType(inputTypeMa7), applySource(inputSourceMa7), lenMa7)
+if inputShowAvg8
+    movingAverage8 := calculateMovingAverage(applyType(inputTypeMa8), applySource(inputSourceMa8), lenMa8)    
+if inputShowAvg9
+    movingAverage9 := calculateMovingAverage(applyType(inputTypeMa9), applySource(inputSourceMa9), lenMa9)
+if inputShowAvg10
+    movingAverage10 := calculateMovingAverage(applyType(inputTypeMa10), applySource(inputSourceMa10), lenMa10)
+if inputShowAvg11
+    movingAverage11 := calculateMovingAverage(applyType(inputTypeMa11), applySource(inputSourceMa11), lenMa11)
+if inputShowAvg12
+    movingAverage12 := calculateMovingAverage(applyType(inputTypeMa12), applySource(inputSourceMa12), lenMa12)
+if inputShowAvg13
+    movingAverage13 := calculateMovingAverage(applyType(inputTypeMa13), applySource(inputSourceMa13), lenMa13)
+if inputShowAvg14
+    movingAverage14 := calculateMovingAverage(applyType(inputTypeMa14), applySource(inputSourceMa14), lenMa14)
+if inputShowAvg15
+    movingAverage15 := calculateMovingAverage(applyType(inputTypeMa15), applySource(inputSourceMa15), lenMa15)
+if inputShowAvg16
+    movingAverage16 := calculateMovingAverage(applyType(inputTypeMa16), applySource(inputSourceMa16), lenMa16)
+if inputShowAvg17
+    movingAverage17 := calculateMovingAverage(applyType(inputTypeMa17), applySource(inputSourceMa17), lenMa17)
+if inputShowAvg18
+    movingAverage18 := calculateMovingAverage(applyType(inputTypeMa18), applySource(inputSourceMa18), lenMa18)
+if inputShowAvg19
+    movingAverage19 := calculateMovingAverage(applyType(inputTypeMa19), applySource(inputSourceMa19), lenMa19)
+if inputShowAvg20
+    movingAverage20 := calculateMovingAverage(applyType(inputTypeMa20), applySource(inputSourceMa20), lenMa20)
+
+// ———————————————————————————————————————— }    
+
+// ———————————————————————————————————————— Colors {
+
+// Bar color
+barcolor( applyBarColor(inputSourceAll) )
+
+// Average colors
+switch inputTheme
+    'Classic' =>
+        inputColorBull1  := #00d906
+        inputColorBull2  := #00d906
+        inputColorBull3  := #00d906
+        inputColorBull4  := #00d906
+        inputColorBull5  := #00d906
+        inputColorBull6  := #00d906
+        inputColorBull7  := #00d906
+        inputColorBull8  := #00d906
+        inputColorBull9  := #00d906
+        inputColorBull10 := #00d906
+        inputColorBull11 := #00d906
+        inputColorBull12 := #00d906
+        inputColorBull13 := #00d906
+        inputColorBull14 := #00d906
+        inputColorBull15 := #00d906
+        inputColorBull16 := #00d906
+        inputColorBull17 := #00d906
+        inputColorBull18 := #00d906
+        inputColorBull19 := #00d906
+        inputColorBull20 := #00d906
+
+        inputColorBear1  := #ff0000
+        inputColorBear2  := #ff0000
+        inputColorBear3  := #ff0000
+        inputColorBear4  := #ff0000
+        inputColorBear5  := #ff0000
+        inputColorBear6  := #ff0000
+        inputColorBear7  := #ff0000
+        inputColorBear8  := #ff0000
+        inputColorBear9  := #ff0000
+        inputColorBear10 := #ff0000
+        inputColorBear11 := #ff0000
+        inputColorBear12 := #ff0000
+        inputColorBear13 := #ff0000
+        inputColorBear14 := #ff0000
+        inputColorBear15 := #ff0000
+        inputColorBear16 := #ff0000
+        inputColorBear17 := #ff0000
+        inputColorBear18 := #ff0000
+        inputColorBear19 := #ff0000
+        inputColorBear20 := #ff0000
+    
+    'Deep Purple' => 
+        inputColorBull1  := #00ff1e
+        inputColorBull2  := #06f81c
+        inputColorBull3  := #0cf01a
+        inputColorBull4  := #10e918
+        inputColorBull5  := #13e217
+        inputColorBull6  := #15da15
+        inputColorBull7  := #16d313
+        inputColorBull8  := #18cc12
+        inputColorBull9  := #19c510
+        inputColorBull10 := #19be0f
+        inputColorBull11 := #1ab70d
+        inputColorBull12 := #1ab00c
+        inputColorBull13 := #1aa90a
+        inputColorBull14 := #1aa209
+        inputColorBull15 := #1a9b08
+        inputColorBull16 := #199407
+        inputColorBull17 := #198e06
+        inputColorBull18 := #188705
+        inputColorBull19 := #188105
+        inputColorBull20 := #177a04
+
+        inputColorBear1  := #f667ff
+        inputColorBear2  := #f163fa
+        inputColorBear3  := #ec5ef5
+        inputColorBear4  := #e65aef
+        inputColorBear5  := #e155ea
+        inputColorBear6  := #dc51e5
+        inputColorBear7  := #d74de0
+        inputColorBear8  := #d248db
+        inputColorBear9  := #cd44d6
+        inputColorBear10 := #c83fd1
+        inputColorBear11 := #c33acb
+        inputColorBear12 := #be35c6
+        inputColorBear13 := #b931c1
+        inputColorBear14 := #b42cbc
+        inputColorBear15 := #af26b7
+        inputColorBear16 := #aa21b3
+        inputColorBear17 := #a51aae
+        inputColorBear18 := #a013a9
+        inputColorBear19 := #9b0aa4
+        inputColorBear20 := #96009f
+    
+    'Sweden' => 
+        inputColorBull1  := #a6b7ff
+        inputColorBull2  := #99acff
+        inputColorBull3  := #8ca2ff
+        inputColorBull4  := #8098ff
+        inputColorBull5  := #738dff
+        inputColorBull6  := #6683ff
+        inputColorBull7  := #5978ff
+        inputColorBull8  := #4d6eff
+        inputColorBull9  := #4064ff
+        inputColorBull10 := #3359ff
+        inputColorBull11 := #264fff
+        inputColorBull12 := #1945ff
+        inputColorBull13 := #0d3aff
+        inputColorBull14 := #0030ff
+        inputColorBull15 := #002ef2
+        inputColorBull16 := #002be6
+        inputColorBull17 := #0029d9
+        inputColorBull18 := #0026cc
+        inputColorBull19 := #0024bf
+        inputColorBull20 := #0022b3
+
+        inputColorBear1  := #ffd54d
+        inputColorBear2  := #ffd240
+        inputColorBear3  := #ffcf33
+        inputColorBear4  := #ffcc26
+        inputColorBear5  := #ffc919
+        inputColorBear6  := #ffc60d
+        inputColorBear7  := #ffc300
+        inputColorBear8  := #f2b900
+        inputColorBear9  := #e6b000
+        inputColorBear10 := #d9a600
+        inputColorBear11 := #cc9c00
+        inputColorBear12 := #bf9200
+        inputColorBear13 := #b38900
+        inputColorBear14 := #a67f00
+        inputColorBear15 := #997500
+        inputColorBear16 := #8c6b00
+        inputColorBear17 := #806200
+        inputColorBear18 := #735800
+        inputColorBear19 := #664e00
+        inputColorBear20 := #594400
+    
+    'Ocean' => 
+        inputColorBull1  := #a1fff7
+        inputColorBull2  := #8ffff6
+        inputColorBull3  := #7dfff4
+        inputColorBull4  := #6bfff3
+        inputColorBull5  := #59fff1
+        inputColorBull6  := #47fff0
+        inputColorBull7  := #36ffee
+        inputColorBull8  := #24ffed
+        inputColorBull9  := #12ffeb
+        inputColorBull10 := #00ffea
+        inputColorBull11 := #00edda
+        inputColorBull12 := #00dbc9
+        inputColorBull13 := #00c9b9
+        inputColorBull14 := #00b8a8
+        inputColorBull15 := #00a698
+        inputColorBull16 := #009488
+        inputColorBull17 := #008277
+        inputColorBull18 := #007067
+        inputColorBull19 := #005e57
+        inputColorBull20 := #004d46
+
+        inputColorBear1  := #ffac40
+        inputColorBear2  := #ffa633
+        inputColorBear3  := #ffa126
+        inputColorBear4  := #ff9b19
+        inputColorBear5  := #ff960d
+        inputColorBear6  := #ff9000
+        inputColorBear7  := #f28900
+        inputColorBear8  := #e68200
+        inputColorBear9  := #d97a00
+        inputColorBear10 := #cc7300
+        inputColorBear11 := #bf6c00
+        inputColorBear12 := #b36500
+        inputColorBear13 := #a65e00
+        inputColorBear14 := #995600
+        inputColorBear15 := #8c4f00
+        inputColorBear16 := #804800
+        inputColorBear17 := #734100
+        inputColorBear18 := #663a00
+        inputColorBear19 := #593200
+        inputColorBear20 := #4d2b00
+
+    'Monokai' => 
+        inputColorBull1  := #e0e0e0
+        inputColorBull2  := #e0e0e0
+        inputColorBull3  := #e0e0e0
+        inputColorBull4  := #e0e0e0
+        inputColorBull5  := #e0e0e0
+        inputColorBull6  := #00fff0
+        inputColorBull7  := #00fff0
+        inputColorBull8  := #00fff0
+        inputColorBull9  := #00fff0
+        inputColorBull10 := #00fff0
+        inputColorBull11 := #a6e22e
+        inputColorBull12 := #a6e22e
+        inputColorBull13 := #a6e22e
+        inputColorBull14 := #a6e22e
+        inputColorBull15 := #a6e22e
+        inputColorBull16 := #8080ff
+        inputColorBull17 := #8080ff
+        inputColorBull18 := #8080ff
+        inputColorBull19 := #8080ff
+        inputColorBull20 := #8080ff
+
+        inputColorBear1  := #f54081
+        inputColorBear2  := #f54081
+        inputColorBear3  := #f54081
+        inputColorBear4  := #f54081
+        inputColorBear5  := #f54081
+        inputColorBear6  := #fd971f
+        inputColorBear7  := #fd971f
+        inputColorBear8  := #fd971f
+        inputColorBear9  := #fd971f
+        inputColorBear10 := #fd971f
+        inputColorBear11 := #ff76fa
+        inputColorBear12 := #ff76fa
+        inputColorBear13 := #ff76fa
+        inputColorBear14 := #ff76fa
+        inputColorBear15 := #ff76fa
+        inputColorBear16 := #f3ff6c
+        inputColorBear17 := #f3ff6c
+        inputColorBear18 := #f3ff6c
+        inputColorBear19 := #f3ff6c
+        inputColorBear20 := #f3ff6c
+
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Plots {
+
+plot1 = plot(movingAverage1, title="Moving Average 1",
+  color=applyColorMovingAverage(inputSourceMa1, movingAverage1, inputColorBull1, inputColorBear1, inputSourceMa1),
+  offset=applyOffset(inputOffsetMa1), 
+  linewidth=1)
+
+plot2 = plot(movingAverage2, title="Moving Average 2",
+  color=applyColorMovingAverage(movingAverage1, movingAverage2, inputColorBull2, inputColorBear2, inputSourceMa2),
+  offset=applyOffset(inputOffsetMa2), 
+  linewidth=1)
+  
+plot3 = plot(movingAverage3, title="Moving Average 3",
+  color=applyColorMovingAverage(movingAverage2, movingAverage3, inputColorBull3, inputColorBear3, inputSourceMa3),
+  offset=applyOffset(inputOffsetMa3), 
+  linewidth=1) 
+  
+plot4 = plot(movingAverage4, title="Moving Average 4",
+  color=applyColorMovingAverage(movingAverage3, movingAverage4, inputColorBull4, inputColorBear4, inputSourceMa4),
+  offset=applyOffset(inputOffsetMa4), 
+  linewidth=1)  
+  
+plot5 = plot(movingAverage5, title="Moving Average 5",
+  color=applyColorMovingAverage(movingAverage4, movingAverage5, inputColorBull5, inputColorBear5, inputSourceMa5),
+  offset=applyOffset(inputOffsetMa5), 
+  linewidth=1)   
+  
+plot6 = plot(movingAverage6, title="Moving Average 6",
+  color=applyColorMovingAverage(movingAverage5, movingAverage6, inputColorBull6, inputColorBear6, inputSourceMa6),
+  offset=applyOffset(inputOffsetMa6), 
+  linewidth=1)
+  
+  
+plot7 = plot(movingAverage7, title="Moving Average 7",
+  color=applyColorMovingAverage(movingAverage6, movingAverage7, inputColorBull7, inputColorBear7, inputSourceMa7),
+  offset=applyOffset(inputOffsetMa7), 
+  linewidth=1)  
+  
+plot8 = plot(movingAverage8, title="Moving Average 8",
+  color=applyColorMovingAverage(movingAverage7, movingAverage8, inputColorBull8, inputColorBear8, inputSourceMa8),
+  offset=applyOffset(inputOffsetMa8), 
+  linewidth=1)    
+  
+plot9 = plot(movingAverage9, title="Moving Average 9",
+  color=applyColorMovingAverage(movingAverage8, movingAverage9, inputColorBull9, inputColorBear9, inputSourceMa9),
+  offset=applyOffset(inputOffsetMa9), 
+  linewidth=1)  
+  
+plot10 = plot(movingAverage10, title="Moving Average 10",
+  color=applyColorMovingAverage(movingAverage9, movingAverage10, inputColorBull10, inputColorBear10, inputSourceMa10),
+  offset=applyOffset(inputOffsetMa10), 
+  linewidth=1)  
+  
+plot11 = plot(movingAverage11, title="Moving Average 11",
+  color=applyColorMovingAverage(movingAverage10, movingAverage11, inputColorBull11, inputColorBear11, inputSourceMa11),
+  offset=applyOffset(inputOffsetMa11), 
+  linewidth=1)  
+  
+plot12 = plot(movingAverage12, title="Moving Average 12",
+  color=applyColorMovingAverage(movingAverage11, movingAverage12, inputColorBull12, inputColorBear12, inputSourceMa12),
+  offset=applyOffset(inputOffsetMa12), 
+  linewidth=1)  
+  
+plot13 = plot(movingAverage13, title="Moving Average 13",
+  color=applyColorMovingAverage(movingAverage12, movingAverage13, inputColorBull13, inputColorBear13, inputSourceMa13),
+  offset=applyOffset(inputOffsetMa13), 
+  linewidth=1)  
+  
+plot14 = plot(movingAverage14, title="Moving Average 14",
+  color=applyColorMovingAverage(movingAverage13, movingAverage14, inputColorBull14, inputColorBear14, inputSourceMa14),
+  offset=applyOffset(inputOffsetMa14), 
+  linewidth=1)  
+  
+plot15 = plot(movingAverage15, title="Moving Average 15",
+  color=applyColorMovingAverage(movingAverage14, movingAverage15, inputColorBull15, inputColorBear15, inputSourceMa15),
+  offset=applyOffset(inputOffsetMa15), 
+  linewidth=1)  
+  
+plot16 = plot(movingAverage16, title="Moving Average 16",
+  color=applyColorMovingAverage(movingAverage15, movingAverage16, inputColorBull16, inputColorBear16, inputSourceMa16),
+  offset=applyOffset(inputOffsetMa16), 
+  linewidth=1)  
+  
+plot17 = plot(movingAverage17, title="Moving Average 17",
+  color=applyColorMovingAverage(movingAverage16, movingAverage17, inputColorBull17, inputColorBear17, inputSourceMa17),
+  offset=applyOffset(inputOffsetMa17), 
+  linewidth=1)  
+
+plot18 = plot(movingAverage18, title="Moving Average 18",
+  color=applyColorMovingAverage(movingAverage17, movingAverage18, inputColorBull18, inputColorBear18, inputSourceMa18),
+  offset=applyOffset(inputOffsetMa18), 
+  linewidth=1)
+
+plot19 = plot(movingAverage19, title="Moving Average 19",
+  color=applyColorMovingAverage(movingAverage18, movingAverage19, inputColorBull19, inputColorBear19, inputSourceMa19),
+  offset=applyOffset(inputOffsetMa19), 
+  linewidth=1)  
+  
+plot20 = plot(movingAverage20, title="Moving Average 20",
+  color=applyColorMovingAverage(movingAverage19, movingAverage20, inputColorBull20, inputColorBear20, inputSourceMa1),
+  offset=applyOffset(inputOffsetMa19), 
+  linewidth=1)   
+
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Fills {
+
+fill(plot1,  plot2,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa1, movingAverage1, inputColorBull1, inputColorBear1, inputSourceMa1),  inputColorFillTransparency) : na )
+fill(plot2,  plot3,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa2, movingAverage2, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot3,  plot4,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa3, movingAverage3, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot4,  plot5,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa4, movingAverage4, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot5,  plot6,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa5, movingAverage5, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot6,  plot7,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa6, movingAverage6, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot7,  plot8,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa7, movingAverage7, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot8,  plot9,  color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa8, movingAverage8, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot9,  plot10, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa9, movingAverage9, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot10, plot11, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa10, movingAverage10, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot11, plot12, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa11, movingAverage11, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot12, plot13, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa12, movingAverage12, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot13, plot14, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa13, movingAverage13, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot14, plot15, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa14, movingAverage14, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot15, plot16, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa15, movingAverage15, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot16, plot17, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa16, movingAverage16, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot17, plot18, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa17, movingAverage17, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot18, plot19, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa18, movingAverage18, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+fill(plot19, plot20, color=inputFill ? color.new(applyColorMovingAverage(inputSourceMa19, movingAverage19, inputColorBull1, inputColorBear1, inputSourceMa1), inputColorFillTransparency) : na )
+
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Only for benchmark {
+
+// Print table at the end of chart
+// if barstate.islast
+//     var table t = table.new(position.middle_right, 1, 1)
+//     var txt = str.tostring(timePerBarInMs, "ms/bar: #.######\n") +
+//       str.tostring(totalTimeInMs, "Total time (ms): #,###.######\n") + 
+//       str.tostring(barsTimed + barsNotTimed, "Bars analyzed: #")
+//     table.cell(t, 0, 0, txt, bgcolor = color.yellow, text_halign = text.align_right)
+
+// ———————————————————————————————————————— }
