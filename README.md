@@ -146,6 +146,60 @@ Legoux and Kouzis Loukas aimed to provide a leading indicator, as SMAs, EMAs and
 
 ![alt](images/09-ALMA.png)
 
+List of all moving averages:
+
+1. Exponential Moving Average
+2. Simple Moving Average
+3. Relative Moving Average
+4. Weighted Moving Average
+5. Ehlers Dynamic Smoothed Moving Average
+6. Double Exponential Moving Average
+7. Triple Exponential Moving Average
+8. Smoothed Moving Average
+9. Hull Moving Average
+10. Fractal Adaptive Moving Average
+11. Kaufman's Adaptive Moving Average
+12. Volatility Adjusted Moving Average
+13. Jurik Moving Average
+14. Optimized Exponential Moving Average
+15. Exponential Hull Moving Average
+16. Arnaud Legoux Moving Average
+17. Coefficient of Variation Weighted Exponential Moving Average
+18. Coefficient of Variation Weighted Moving Average
+19. * Ehlrs Modified Fractal Adaptive Moving Average
+20. Exponential Triangular Moving Average
+21. Least Squares Moving Average
+22. RSI Moving average
+23. Simple Triangular Moving Average
+24. Triple Hull Moving Average
+25. Variable Index Dynamic Average
+26. Volume-weighted Moving Average
+27. Zero-Lag Exponential Moving Average
+28. Zero-Lag Simple Moving Average
+29. Elastic Volume Weighted Moving Average
+30. Tillson T3
+31. Geometric Moving Average
+32. Welles Wilder Moving Average
+33. Adjusted Moving Average
+34. Corrective Moving average
+35. Exponentially Deviating Moving Average
+36. EMA Range
+37. Sine-Weighted Moving Average
+38. Adaptive Moving Average TABLE
+39. Following Adaptive Moving Average
+40. Hilbert based Kaufman's Adaptive Moving Average
+41. Median
+42. * VWAP
+43. * Rolling VWAP
+44. Triangular Simple Moving Average
+45. Triangular Exponential Moving Average
+46. ​​Moving Average Price Correlation
+47. Regularized Exponential Moving Average
+48. Repulsion Moving Average
+49. * Symmetrically Weighted Moving Average
+
+* fixed period averages
+
 ### Donations
 
 Bitcoin: 3AK6MxX93czQraP4AFv1wKYDvPnPipgF51
