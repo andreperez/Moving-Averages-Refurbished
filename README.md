@@ -202,8 +202,8 @@ List of all moving averages:
 
 ### Donations
 
-Bitcoin: 3AK6MxX93czQraP4AFv1wKYDvPnPipgF51
-
-Dash: XuSnX2YgsGVcfKY24TtndBu5X7tZShPTC7
-
-LiteCoin: MQEmwEqLA3WUsuQ1E6u8wDxzUrDRotZyH8
+- BTC: 1PnerhP2C5xeGXxAkhxQX4rYrBUguGe1yh
+- LTC: LMhAfkzJoUHHWfFCcMnnQ4jdV4Vi9WZG3W
+- Stellar: GCPONJ5OX7KSEHBNPB2SKJZJGYSXTRN7ORYQXW443BLEFLS72ZVYISG2
+- Zcash: t1THe8JvsYqt7bmbFWkFpjssJhJLka6VAhk
+- Tron: TSVnEgtoYhRMwiRYfDFC51XfGNSpxse2yz
